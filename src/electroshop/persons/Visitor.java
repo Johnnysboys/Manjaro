@@ -11,23 +11,18 @@ import electroshop.Basket;
  *
  * @author Jakob
  */
-public class Visitor extends Person{
-    
-    
-    
-    public Visitor(){
-        this.basket = new Basket();
-        this.sec = 0;
-        
+public class Visitor extends Person {
+
+    public Visitor() {
+        super(0, new Basket());
     }
-    
-    
-    public void login(String email, String pw){
-        
+
+    public void login(String email, String pw) {
+
     }
-    
+
     @Override
-    public String getTitle(){
+    public String getTitle() {
         return "(Visitor)";
     }
 }

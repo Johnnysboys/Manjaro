@@ -6,14 +6,36 @@
 package electroshop.connectors;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 /**
  *
  * @author Jakob
  */
 public abstract class SuperDB {
-    String hostName;
-    String userName;
-    String password;
-    Connection con;
+    private String hostName;
+    private String userName;
+    private String password;
+    private Connection con;
+    
+    public SuperDB(String host, String user, String pword) {
+        this.hostName = host;
+        this.userName = user;
+        this.password = pword;
+
+        try {
+            con = DriverManager.getConnection(hostName, userName, password);
+            System.out.println("Opened database successfully");
+
+        } catch (SQLException err) {
+            System.out.println(err.getMessage());
+            System.out.println("Could not connect to database.");
+        }
+
+    }
+    
+    public Connection getCon(){
+        return this.con;
+    }
 }

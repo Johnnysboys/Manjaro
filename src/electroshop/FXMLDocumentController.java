@@ -6,6 +6,7 @@
 package electroshop;
 
 import electroshop.persons.Visitor;
+import electroshop.persons.LoggedInPerson;
 import electroshop.connectors.AccountsConnector;
 import electroshop.persons.Person;
 import java.net.URL;
@@ -26,6 +27,7 @@ import javafx.scene.layout.Pane;
 public class FXMLDocumentController implements Initializable {
     
     private Person activeUser;
+    private LoggedInPerson loggedInPerson;
     private AccountsConnector accCon;
 
     @FXML
@@ -60,19 +62,22 @@ public class FXMLDocumentController implements Initializable {
         String email = emailField.getText();
         String pw = pwField.getText();
         
-        Person person = accCon.login(email, pw, activeUser.getBasket());
+        loggedInPerson = accCon.login(email, pw, activeUser.getBasket());
         
-        if(person == null){
+        if(loggedInPerson == null){
             System.out.println("LOGIN NOT SUCCESFULL");
             loginPane.setStyle("-fx-background-color: #800000");
         } else {
             System.out.println("LOGIN SUCCESFULL");
-            activeUser = accCon.login(email, pw, activeUser.getBasket());
+            //activeUser = accCon.login(email, pw, activeUser.getBasket());
+            activeUser = loggedInPerson;
             loginPane.setVisible(false);
             
             StringBuilder sb = new StringBuilder();
-            sb.append(activeUser.getEmail()).append(" ");
-            sb.append(activeUser.getTitle());
+            
+            
+            sb.append(loggedInPerson.getEmail()).append(" ");
+            sb.append(loggedInPerson.getTitle());
             userInfoLabel.setText(sb.toString());
             loggedInPane.setVisible(true);
         }

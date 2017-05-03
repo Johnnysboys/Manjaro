@@ -11,55 +11,14 @@ import electroshop.Basket;
  *
  * @author Jakob
  */
-public class Person {
+public abstract class Person {
 
-    String email;
-    String name;
-    String phone;
-    String address;
-    String pw;
-    int sec;
+    private int sec;
+    private Basket basket;
 
-    Basket basket;
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getPw() {
-        return pw;
-    }
-
-    public void setPw(String pw) {
-        this.pw = pw;
+    public Person(int sec, Basket basket) {
+        this.sec = sec;
+        this.basket = basket;
     }
 
     public int getSec() {
@@ -77,8 +36,8 @@ public class Person {
     public void setBasket(Basket basket) {
         this.basket = basket;
     }
-    
-    public String getTitle(){
+
+    public String getTitle() {
         return null;
     }
 

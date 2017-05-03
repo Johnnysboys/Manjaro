@@ -5,20 +5,16 @@
  */
 package electroshop.persons;
 
+import electroshop.Basket;
+
 /**
  *
  * @author Jakob
  */
-public class Administrator extends Person {
+public class Administrator extends LoggedInPerson {
 
-    public Administrator(String email, String name, String phone, String address, String pw) {
-
-        this.email = email;
-        this.name = name;
-        this.phone = phone;
-        this.address = address;
-        this.pw = pw;
-        this.sec = 3;
+    public Administrator(int id, String email, String name, String phone, String address, String pw, Basket basket) {
+        super(id, email, name, phone, address, pw, 3, basket);
 
     }
 

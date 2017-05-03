@@ -5,25 +5,20 @@
  */
 package electroshop.persons;
 
+import electroshop.Basket;
+
 /**
  *
  * @author Jakob
  */
-public class Employee extends Person {
+public class Employee extends LoggedInPerson {
 
-    public Employee(String email, String name, String phone, String address, String pw) {
-
-        this.email = email;
-        this.name = name;
-        this.phone = phone;
-        this.address = address;
-        this.pw = pw;
-        this.sec = 2;
-
+    public Employee(int id, String email, String name, String phone, String address, String pw, Basket basket) {
+        super(id, email, name, phone, address, pw, 2, basket);
     }
-    
+
     @Override
-    public String getTitle(){
+    public String getTitle() {
         return "(Employee)";
     }
 }
