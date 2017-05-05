@@ -6,29 +6,152 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="518.0" prefWidth="596.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="electroshop.FXMLDocumentController">
+<AnchorPane id="AnchorPane" prefHeight="892.0" prefWidth="1498.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="electroshop.FXMLDocumentController">
    <children>
-      <Pane fx:id="loggedInPane" layoutX="14.0" layoutY="439.0" prefHeight="75.0" prefWidth="574.0" style="-fx-border-color: black;" visible="false">
-         <children>
-            <Button fx:id="logoutButton" layoutX="492.0" layoutY="22.0" mnemonicParsing="false" onAction="#handleLogout" text="Logout" />
-            <Label layoutX="25.0" layoutY="27.0" text="Logged in as:" />
-            <Label fx:id="userInfoLabel" layoutX="122.0" layoutY="27.0" text="setEmailHere + (SecurityLevel)" />
-         </children>
-      </Pane>
-      <Pane fx:id="loginPane" layoutX="14.0" layoutY="439.0" prefHeight="75.0" prefWidth="574.0" style="-fx-border-color: black;">
+      <Pane fx:id="loginPane" layoutX="14.0" layoutY="803.0" prefHeight="75.0" prefWidth="574.0" style="-fx-border-color: black;">
          <children>
             <Button fx:id="loginButton" layoutX="503.0" layoutY="22.0" mnemonicParsing="false" onAction="#handleLogin" text="Login" />
             <TextField fx:id="emailField" layoutX="14.0" layoutY="22.0" prefHeight="31.0" prefWidth="266.0" />
             <Label layoutX="14.0" layoutY="4.0" prefHeight="21.0" prefWidth="186.0" text="E-mail:" />
             <Label layoutX="305.0" layoutY="4.0" prefHeight="21.0" prefWidth="186.0" text="Password:" />
             <PasswordField fx:id="pwField" layoutX="305.0" layoutY="22.0" />
+            <Pane fx:id="loggedInPane" prefHeight="75.0" prefWidth="574.0" style="-fx-border-color: black;" visible="false">
+               <children>
+                  <Button fx:id="logoutButton" layoutX="492.0" layoutY="22.0" mnemonicParsing="false" onAction="#handleLogout" text="Logout" />
+                  <Label layoutX="25.0" layoutY="27.0" text="Logged in as:" />
+                  <Label fx:id="userInfoLabel" layoutX="122.0" layoutY="27.0" text="setEmailHere + (SecurityLevel)" />
+               </children>
+            </Pane>
          </children>
       </Pane>
-      <TabPane layoutX="14.0" layoutY="14.0" prefHeight="369.0" prefWidth="596.0" style="-fx-border-color: black;" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="84.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <TabPane layoutX="14.0" layoutY="14.0" prefHeight="559.0" prefWidth="986.0" style="-fx-border-color: black;" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="151.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <tabs>
           <Tab text="Browse">
             <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="535.0" prefWidth="984.0">
+                     <children>
+                        <ComboBox fx:id="categoryDrop" layoutX="14.0" layoutY="14.0" onAction="#changeSelection" prefWidth="150.0" promptText="Category" />
+                        <Pane fx:id="genPane" layoutX="14.0" layoutY="53.0" prefHeight="83.0" prefWidth="494.0" style="-fx-border-color: black;" />
+                        <Pane fx:id="computerPane" layoutX="14.0" layoutY="144.0" prefHeight="112.0" prefWidth="494.0" style="-fx-border-color: black;">
+                           <children>
+                              <TextField layoutX="131.0" layoutY="42.0" />
+                              <TextField layoutX="131.0" layoutY="9.0" />
+                              <Label layoutX="18.0" layoutY="14.0" text="Processor Speed:" />
+                              <Label layoutX="91.0" layoutY="46.0" text="RAM:" />
+                              <TextField layoutX="131.0" layoutY="74.0" />
+                              <Label layoutX="326.0" layoutY="14.0" text="GigaHertz (Double)" />
+                              <Label layoutX="326.0" layoutY="47.0" text="GB (int)" />
+                              <Label layoutX="18.0" layoutY="79.0" text="Harddrive Space:" />
+                              <Label layoutX="326.0" layoutY="79.0" text="GB (int)" />
+                           </children>
+                        </Pane>
+                        <Pane fx:id="laptopPane" layoutX="14.0" layoutY="279.0" prefHeight="118.0" prefWidth="494.0" style="-fx-border-color: black;">
+                           <children>
+                              <TextField layoutX="131.0" layoutY="42.0" />
+                              <TextField layoutX="131.0" layoutY="9.0" />
+                              <Label layoutX="55.0" layoutY="14.0" text="Screensize:" />
+                              <Label layoutX="77.0" layoutY="47.0" text="Weight:" />
+                              <Label layoutX="329.0" layoutY="47.0" text="Kg (Int)" />
+                              <Label layoutX="328.0" layoutY="14.0" text="Tommer (Double)" />
+                              <TextField layoutX="131.0" layoutY="74.0" />
+                              <Label layoutX="52.0" layoutY="78.0" text="Battery Life:" />
+                              <Label layoutX="329.0" layoutY="78.0" text="Minut (Int)" />
+                           </children>
+                        </Pane>
+                        <Pane fx:id="desktopPane" layoutX="16.0" layoutY="405.0" prefHeight="118.0" prefWidth="490.0" style="-fx-border-color: black;">
+                           <children>
+                              <Label layoutX="320.0" layoutY="14.0" text="Type (String)" />
+                              <TextField layoutX="127.0" layoutY="9.0" />
+                              <Label layoutX="51.0" layoutY="14.0" text="Formfactor:" />
+                              <Label layoutX="24.0" layoutY="61.0" text="Integrated Wifi:" />
+                              <ComboBox fx:id="integratedWifiCombo" layoutX="127.0" layoutY="56.0" prefHeight="31.0" prefWidth="88.0" />
+                           </children>
+                        </Pane>
+                        <Pane fx:id="whiteGoodsPane" layoutX="1028.0" layoutY="14.0" prefHeight="112.0" prefWidth="494.0" style="-fx-border-color: black;">
+                           <children>
+                              <TextField layoutX="131.0" layoutY="42.0" />
+                              <TextField layoutX="131.0" layoutY="9.0" />
+                              <Label layoutX="52.0" layoutY="14.0" text="Noise Level:" />
+                              <Label layoutX="37.0" layoutY="47.0" text="Energy Usage:" />
+                              <Label layoutX="326.0" layoutY="14.0" text="Decibel (Int)" />
+                              <Label layoutX="326.0" layoutY="47.0" text="kWh (Int)" />
+                           </children>
+                        </Pane>
+                        <Pane fx:id="washingPane" layoutX="14.0" layoutY="532.0" prefHeight="118.0" prefWidth="494.0" style="-fx-border-color: black;">
+                           <children>
+                              <TextField layoutX="131.0" layoutY="42.0" />
+                              <TextField layoutX="131.0" layoutY="9.0" />
+                              <Label layoutX="96.0" layoutY="14.0" text="RPM:" />
+                              <Label layoutX="71.0" layoutY="47.0" text="Capacity:" />
+                              <Label layoutX="329.0" layoutY="47.0" text="Kg (Int)" />
+                              <Label layoutX="328.0" layoutY="14.0" text="(Int)" />
+                           </children>
+                        </Pane>
+                        <Pane fx:id="fridgePane" layoutX="1028.0" layoutY="532.0" prefHeight="118.0" prefWidth="494.0" style="-fx-border-color: black;">
+                           <children>
+                              <TextField layoutX="131.0" layoutY="42.0" />
+                              <TextField layoutX="131.0" layoutY="9.0" />
+                              <Label layoutX="76.0" layoutY="14.0" text="Volume:" />
+                              <Label layoutX="88.0" layoutY="49.0" text="Shelfs:" />
+                              <Label layoutX="329.0" layoutY="47.0" text="(Int)" />
+                              <Label layoutX="328.0" layoutY="14.0" text="Liter (Double)" />
+                           </children>
+                        </Pane>
+                        <Pane fx:id="tvRadioPane" layoutX="1028.0" layoutY="144.0" prefHeight="112.0" prefWidth="494.0" style="-fx-border-color: black;">
+                           <children>
+                              <TextField layoutX="131.0" layoutY="42.0" />
+                              <TextField layoutX="131.0" layoutY="9.0" />
+                              <Label layoutX="47.0" layoutY="14.0" text="Sound Level:" />
+                              <Label layoutX="92.0" layoutY="47.0" text="Color:" />
+                              <Label layoutX="326.0" layoutY="14.0" text="Decibel (Int)" />
+                              <Label layoutX="326.0" layoutY="47.0" text="(String)" />
+                           </children>
+                        </Pane>
+                        <Pane fx:id="tvPane" layoutX="1028.0" layoutY="279.0" prefHeight="118.0" prefWidth="494.0" style="-fx-border-color: black;">
+                           <children>
+                              <TextField layoutX="131.0" layoutY="42.0" />
+                              <TextField layoutX="131.0" layoutY="9.0" />
+                              <Label layoutX="58.0" layoutY="14.0" text="Screensize:" />
+                              <Label layoutX="57.0" layoutY="47.0" text="Resolution:" />
+                              <Label layoutX="329.0" layoutY="47.0" text="(String)" />
+                              <Label layoutX="328.0" layoutY="14.0" text="Tommer (Double)" />
+                              <Label layoutX="56.0" layoutY="82.0" text="Panel Type:" />
+                              <TextField layoutX="131.0" layoutY="77.0" />
+                              <Label layoutX="329.0" layoutY="82.0" text="(String)" />
+                           </children>
+                        </Pane>
+                        <Pane fx:id="radioPane" layoutX="1028.0" layoutY="405.0" prefHeight="118.0" prefWidth="494.0" style="-fx-border-color: black;">
+                           <children>
+                              <TextField layoutX="131.0" layoutY="42.0" />
+                              <TextField layoutX="131.0" layoutY="9.0" />
+                              <Label layoutX="53.0" layoutY="14.0" text="Battery Life:" />
+                              <Label layoutX="92.0" layoutY="47.0" text="Effect:" />
+                              <Label layoutX="329.0" layoutY="47.0" text="Watt (Int)" />
+                              <Label layoutX="328.0" layoutY="14.0" text="Mintes (Int)" />
+                           </children>
+                        </Pane>
+                        <Pane fx:id="generalPane" layoutX="606.0" layoutY="159.0" prefHeight="358.0" prefWidth="338.0" style="-fx-border-color: black;">
+                           <children>
+                              <Label fx:id="column1Label" layoutX="32.0" layoutY="89.0" text="column1" />
+                              <Label fx:id="column2Label" layoutX="32.0" layoutY="126.0" text="column2" />
+                              <Label fx:id="column3Label" layoutX="32.0" layoutY="163.0" text="column3" />
+                              <Label fx:id="column4Label" layoutX="32.0" layoutY="200.0" text="column4" />
+                              <Label fx:id="column5Label" layoutX="32.0" layoutY="237.0" text="column5" />
+                              <Label fx:id="column6Label" layoutX="32.0" layoutY="274.0" text="column6" />
+                              <Label layoutX="27.0" layoutY="16.0" text="Product Name:" />
+                              <Label layoutX="90.0" layoutY="52.0" text="Price:" />
+                              <TextField fx:id="nameField" layoutX="126.0" layoutY="11.0" />
+                              <TextField fx:id="priceField" layoutX="126.0" layoutY="47.0" />
+                              <TextField fx:id="column1Field" layoutX="126.0" layoutY="84.0" />
+                              <TextField fx:id="column2Field" layoutX="126.0" layoutY="121.0" />
+                              <TextField fx:id="column3Field" layoutX="126.0" layoutY="158.0" />
+                              <TextField fx:id="column6Field" layoutX="126.0" layoutY="269.0" />
+                              <TextField fx:id="column5Field" layoutX="126.0" layoutY="232.0" />
+                              <TextField fx:id="column4Field" layoutX="126.0" layoutY="195.0" />
+                           </children>
+                        </Pane>
+                     </children>
+                  </AnchorPane>
             </content>
           </Tab>
           <Tab text="Basket">
