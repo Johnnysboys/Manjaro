@@ -26,8 +26,21 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Pane;
+import products.Product;
+import products.Computer;
+import products.Desktop;
+import products.Fridge;
+import products.Laptop;
+import products.Radio;
+import products.Tv;
+import products.TvRadio;
+import products.WashingMachine;
+import products.WhiteGoods;
 
 /**
  *
@@ -39,6 +52,8 @@ public class FXMLDocumentController implements Initializable {
     private LoggedInPerson loggedInPerson;
     private AccountsConnector accCon;
     private ProductConnector prodCon;
+    private ArrayList<String> catColumnsList;
+    private ObservableList<Product> prodSearch;
 
     @FXML
     private Pane loginPane;
@@ -69,28 +84,6 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private ComboBox<String> categoryDrop;
     @FXML
-    private Pane genPane;
-    @FXML
-    private Pane desktopPane;
-    @FXML
-    private ComboBox<String> integratedWifiCombo;
-    @FXML
-    private Pane computerPane;
-    @FXML
-    private Pane laptopPane;
-    @FXML
-    private Pane washingPane;
-    @FXML
-    private Pane fridgePane;
-    @FXML
-    private Pane tvRadioPane;
-    @FXML
-    private Pane tvPane;
-    @FXML
-    private Pane whiteGoodsPane;
-    @FXML
-    private Pane radioPane;
-    @FXML
     private Pane generalPane;
     @FXML
     private Label column1Label;
@@ -120,6 +113,26 @@ public class FXMLDocumentController implements Initializable {
     private TextField column5Field;
     @FXML
     private TextField column4Field;
+    @FXML
+    private Pane namePane;
+    @FXML
+    private Pane pricePane;
+    @FXML
+    private Pane column1Pane;
+    @FXML
+    private Pane column2Pane;
+    @FXML
+    private Pane column3Pane;
+    @FXML
+    private Pane column4Pane;
+    @FXML
+    private Pane column5Pane;
+    @FXML
+    private Pane column6Pane;
+    @FXML
+    private Button searchButton;
+    @FXML
+    private TableView<Product> productTable;
 
     @FXML
     private void handleLogin(ActionEvent event) throws SQLException {
@@ -133,7 +146,6 @@ public class FXMLDocumentController implements Initializable {
             loginPane.setStyle("-fx-background-color: #800000");
         } else {
             System.out.println("LOGIN SUCCESFULL");
-            //activeUser = accCon.login(email, pw, activeUser.getBasket());
             activeUser = loggedInPerson;
             loginPane.setVisible(false);
 
@@ -143,45 +155,243 @@ public class FXMLDocumentController implements Initializable {
             sb.append(loggedInPerson.getTitle());
             userInfoLabel.setText(sb.toString());
             loggedInPane.setVisible(true);
+
+            //productTable.
         }
 
     }
 
     @FXML
+    private void searchProducts(ActionEvent event) throws SQLException {
+        String category = (String) categoryDrop.getValue();
+        String name = nameField.getText();
+        String price = priceField.getText();
+        String col1 = column1Field.getText();
+        String col2 = column2Field.getText();
+        String col3 = column3Field.getText();
+        String col4 = column4Field.getText();
+        String col5 = column5Field.getText();
+        String col6 = column6Field.getText();
+
+        prodSearch = FXCollections.observableArrayList(prodCon.findProducts(category, catColumnsList, name, price, col1, col2, col3, col4, col5, col6));
+        if(prodSearch == null){
+            System.out.println("No products found"); // WHAT DO WE DO 
+            return;
+        }
+        
+        
+        
+        productTable.setEditable(true);
+        int columnAmount = catColumnsList.size();
+        System.out.println(columnAmount);
+        productTable.getColumns().clear();
+
+        if (columnAmount == 4) {
+            System.out.println("printing 4 columns");
+            TableColumn c1 = new TableColumn(catColumnsList.get(1));
+            TableColumn c2 = new TableColumn(catColumnsList.get(2));
+            TableColumn c3 = new TableColumn(catColumnsList.get(3));
+            productTable.getColumns().addAll(c1, c2, c3);
+            
+            c1.setCellValueFactory (new PropertyValueFactory<Product, String>("productName"));
+            c2.setCellValueFactory (new PropertyValueFactory<Product, String>("price"));
+            c3.setCellValueFactory (new PropertyValueFactory<Product, String>("description"));
+           
+           
+        } else if (columnAmount == 5) {
+            System.out.println("printing 5 columns");
+            TableColumn c1 = new TableColumn(catColumnsList.get(1));
+            TableColumn c2 = new TableColumn(catColumnsList.get(2));
+            TableColumn c3 = new TableColumn(catColumnsList.get(3));
+            TableColumn c4 = new TableColumn(catColumnsList.get(4));
+            productTable.getColumns().addAll(c1, c2, c3, c4);
+            
+            
+            c1.setCellValueFactory (new PropertyValueFactory<Product, String>("productName"));
+            c2.setCellValueFactory (new PropertyValueFactory<Product, String>("price"));
+            c3.setCellValueFactory (new PropertyValueFactory<Product, String>("description"));
+            c4.setCellValueFactory (new PropertyValueFactory<Product, String>("firstAtt"));
+        } else if (columnAmount == 6) {
+            System.out.println("printing 6 columns");
+            TableColumn c1 = new TableColumn(catColumnsList.get(1));
+            TableColumn c2 = new TableColumn(catColumnsList.get(2));
+            TableColumn c3 = new TableColumn(catColumnsList.get(3));
+            TableColumn c4 = new TableColumn(catColumnsList.get(4));
+            TableColumn c5 = new TableColumn(catColumnsList.get(5));
+            productTable.getColumns().addAll(c1, c2, c3, c4, c5);
+            
+            
+            
+            c1.setCellValueFactory (new PropertyValueFactory<Product, String>("productName"));
+            c2.setCellValueFactory (new PropertyValueFactory<Product, String>("price"));
+            c3.setCellValueFactory (new PropertyValueFactory<Product, String>("description"));            
+            c4.setCellValueFactory (new PropertyValueFactory<Product, String>("firstAtt"));
+            c5.setCellValueFactory (new PropertyValueFactory<Product, String>("secondAtt"));
+        } else if (columnAmount == 7){
+            System.out.println("printing 7 columns");
+            TableColumn c1 = new TableColumn(catColumnsList.get(1));
+            TableColumn c2 = new TableColumn(catColumnsList.get(2));
+            TableColumn c3 = new TableColumn(catColumnsList.get(3));
+            TableColumn c4 = new TableColumn(catColumnsList.get(4));
+            TableColumn c5 = new TableColumn(catColumnsList.get(5));
+            TableColumn c6 = new TableColumn(catColumnsList.get(6));
+            productTable.getColumns().addAll(c1, c2, c3, c4, c5, c6);
+            
+            
+            c1.setCellValueFactory (new PropertyValueFactory<Product, String>("productName"));
+            c2.setCellValueFactory (new PropertyValueFactory<Product, String>("price"));
+            c3.setCellValueFactory (new PropertyValueFactory<Product, String>("description"));
+            c4.setCellValueFactory (new PropertyValueFactory<Product, String>("firstAtt"));
+            c5.setCellValueFactory (new PropertyValueFactory<Product, String>("secondAtt"));
+            c6.setCellValueFactory (new PropertyValueFactory<Product, String>("thirdAtt"));
+        } else if (columnAmount == 8) {
+            System.out.println("printing 8 columns");
+            TableColumn c1 = new TableColumn(catColumnsList.get(1));
+            TableColumn c2 = new TableColumn(catColumnsList.get(2));
+            TableColumn c3 = new TableColumn(catColumnsList.get(3));
+            TableColumn c4 = new TableColumn(catColumnsList.get(4));
+            TableColumn c5 = new TableColumn(catColumnsList.get(5));
+            TableColumn c6 = new TableColumn(catColumnsList.get(6));
+            TableColumn c7 = new TableColumn(catColumnsList.get(7));
+            
+            c1.setCellValueFactory (new PropertyValueFactory<Product, String>("productName"));
+            c2.setCellValueFactory (new PropertyValueFactory<Product, String>("price"));
+            c3.setCellValueFactory (new PropertyValueFactory<Product, String>("description"));
+            c4.setCellValueFactory (new PropertyValueFactory<Product, String>("firstAtt"));
+            c5.setCellValueFactory (new PropertyValueFactory<Product, String>("secondAtt"));
+            c6.setCellValueFactory (new PropertyValueFactory<Product, String>("thirdAtt"));
+            c7.setCellValueFactory (new PropertyValueFactory<Product, String>("forthAtt"));
+            
+            productTable.getColumns().addAll(c1, c2, c3, c4, c5, c6, c7);
+        } else if (columnAmount == 9){
+            System.out.println("printing 9 columns");
+            TableColumn c1 = new TableColumn(catColumnsList.get(1));
+            TableColumn c2 = new TableColumn(catColumnsList.get(2));
+            TableColumn c3 = new TableColumn(catColumnsList.get(3));
+            TableColumn c4 = new TableColumn(catColumnsList.get(4));
+            TableColumn c5 = new TableColumn(catColumnsList.get(5));
+            TableColumn c6 = new TableColumn(catColumnsList.get(6));
+            TableColumn c7 = new TableColumn(catColumnsList.get(7));
+            TableColumn c8 = new TableColumn(catColumnsList.get(8));
+            productTable.getColumns().addAll(c1, c2, c3, c4, c5, c6, c7, c8);
+            
+            c1.setCellValueFactory (new PropertyValueFactory<Product, String>("productName"));
+            c2.setCellValueFactory (new PropertyValueFactory<Product, String>("price"));
+            c3.setCellValueFactory (new PropertyValueFactory<Product, String>("description"));
+            c4.setCellValueFactory (new PropertyValueFactory<Product, String>("processor"));
+            c5.setCellValueFactory (new PropertyValueFactory<Product, String>("secondAtt"));
+            c6.setCellValueFactory (new PropertyValueFactory<Product, String>("thirdAtt"));
+            c7.setCellValueFactory (new PropertyValueFactory<Product, String>("forthAtt"));
+            c8.setCellValueFactory (new PropertyValueFactory<Product, String>("fifthAtt"));
+            
+            
+        } else {
+            System.out.println("printing 10 columns");
+            TableColumn c1 = new TableColumn(catColumnsList.get(1));
+            TableColumn c2 = new TableColumn(catColumnsList.get(2));
+            TableColumn c3 = new TableColumn(catColumnsList.get(3));
+            TableColumn c4 = new TableColumn(catColumnsList.get(4));
+            TableColumn c5 = new TableColumn(catColumnsList.get(5));
+            TableColumn c6 = new TableColumn(catColumnsList.get(6));
+            TableColumn c7 = new TableColumn(catColumnsList.get(7));
+            TableColumn c8 = new TableColumn(catColumnsList.get(8));
+            TableColumn c9 = new TableColumn(catColumnsList.get(9));
+            productTable.getColumns().addAll(c1, c2, c3, c4, c5, c6, c7, c8, c9);
+            
+            
+            c1.setCellValueFactory (new PropertyValueFactory<Product, String>("productName"));
+            c2.setCellValueFactory (new PropertyValueFactory<Product, String>("price"));
+            c3.setCellValueFactory (new PropertyValueFactory<Product, String>("description"));
+            c4.setCellValueFactory (new PropertyValueFactory<Product, String>("firstAtt"));
+            c5.setCellValueFactory (new PropertyValueFactory<Product, String>("secondAtt"));
+            c6.setCellValueFactory (new PropertyValueFactory<Product, String>("thirdAtt"));
+            c7.setCellValueFactory (new PropertyValueFactory<Product, String>("forthAtt"));
+            c8.setCellValueFactory (new PropertyValueFactory<Product, String>("fifthAtt"));
+            c9.setCellValueFactory (new PropertyValueFactory<Product, String>("sixthAtt"));
+        }
+
+        int a = prodSearch.size();
+        System.out.println("Showing "+a+" products.");
+        
+        
+
+        // productTable.getColumns().addAll(catColumnsList.get(0));
+        //prodSearch = prodCon.findProducts(category, catColumnsList, name, price, col1, col2, col3, col4, col5, col6);
+        productTable.setItems(prodSearch);
+        //System.out.println(prodCon.findProducts(category, catColumnsList, name, price, col1, col2, col3, col4, col5, col6));
+    }
+
+    @FXML
     private void changeSelection(ActionEvent event) throws SQLException {
         String s = (String) categoryDrop.getValue();
-        ArrayList<String> list = prodCon.getColumns(s);
-        
-        int columnSize = list.size();
-        
-        genPane.setVisible(true);
-        computerPane.setVisible(false); laptopPane.setVisible(false); desktopPane.setVisible(false); whiteGoodsPane.setVisible(false); washingPane.setVisible(false); fridgePane.setVisible(false); tvRadioPane.setVisible(false); tvPane.setVisible(false); radioPane.setVisible(false);
-        
-        switch (s) {
-            case "laptops":                
-                computerPane.setVisible(true);
-                laptopPane.setVisible(true);
+        catColumnsList = prodCon.getColumns(s);
+        searchButton.setDisable(false);
+
+        int columnSize = catColumnsList.size();
+
+        column1Pane.setVisible(false);
+        column2Pane.setVisible(false);
+        column3Pane.setVisible(false);
+        column4Pane.setVisible(false);
+        column5Pane.setVisible(false);
+        column6Pane.setVisible(false);
+
+        switch (columnSize) {
+            case 5:
+                column1Label.setText(catColumnsList.get(4));
+                column1Pane.setVisible(true);
                 break;
-            case "desktops":
-                computerPane.setVisible(true);
-                desktopPane.setVisible(true);
+            case 6:
+                column1Label.setText(catColumnsList.get(4));
+                column2Label.setText(catColumnsList.get(5));
+                column1Pane.setVisible(true);
+                column2Pane.setVisible(true);
                 break;
-            case "washingmachine":
-                whiteGoodsPane.setVisible(true);
-                washingPane.setVisible(true);
+            case 7:
+                column1Label.setText(catColumnsList.get(4));
+                column2Label.setText(catColumnsList.get(5));
+                column3Label.setText(catColumnsList.get(6));
+                column1Pane.setVisible(true);
+                column2Pane.setVisible(true);
+                column3Pane.setVisible(true);
                 break;
-            case "fridge":
-                whiteGoodsPane.setVisible(true);
-                fridgePane.setVisible(true);
+            case 8:
+                column1Label.setText(catColumnsList.get(4));
+                column2Label.setText(catColumnsList.get(5));
+                column3Label.setText(catColumnsList.get(6));
+                column4Label.setText(catColumnsList.get(7));
+                column1Pane.setVisible(true);
+                column2Pane.setVisible(true);
+                column3Pane.setVisible(true);
+                column4Pane.setVisible(true);
                 break;
-            case "tv":
-                tvRadioPane.setVisible(true);
-                tvPane.setVisible(true);
+            case 9:
+                column1Label.setText(catColumnsList.get(4));
+                column2Label.setText(catColumnsList.get(5));
+                column3Label.setText(catColumnsList.get(6));
+                column4Label.setText(catColumnsList.get(7));
+                column5Label.setText(catColumnsList.get(8));
+                column1Pane.setVisible(true);
+                column2Pane.setVisible(true);
+                column3Pane.setVisible(true);
+                column4Pane.setVisible(true);
+                column5Pane.setVisible(true);
                 break;
-            case "radio":
-                tvRadioPane.setVisible(true);
-                radioPane.setVisible(true);
+            case 10:
+                column1Label.setText(catColumnsList.get(4));
+                column2Label.setText(catColumnsList.get(5));
+                column3Label.setText(catColumnsList.get(6));
+                column4Label.setText(catColumnsList.get(7));
+                column5Label.setText(catColumnsList.get(8));
+                column6Label.setText(catColumnsList.get(9));
+                column1Pane.setVisible(true);
+                column2Pane.setVisible(true);
+                column3Pane.setVisible(true);
+                column4Pane.setVisible(true);
+                column5Pane.setVisible(true);
+                column6Pane.setVisible(true);
                 break;
+
         }
 
     }
@@ -223,9 +433,6 @@ public class FXMLDocumentController implements Initializable {
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
-
-        ObservableList<String> options = FXCollections.observableArrayList("Yes","No");
-        integratedWifiCombo.setItems(options);
 
     }
 

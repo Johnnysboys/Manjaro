@@ -5,6 +5,8 @@
  */
 package products;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author Jakob
@@ -18,6 +20,9 @@ public class Desktop extends Computer {
         super(processor, ram, harddrivesSize, productId, productName, price, productDesc);
         this.formfactor = formfactor;
         this.integratedWifi = integratedWifi;
+        
+
+        
     }
 
     public String getFormfactor() {
@@ -36,4 +41,24 @@ public class Desktop extends Computer {
         this.integratedWifi = integratedWifi;
     }
 
+        @Override
+    public ArrayList<String> getProductRow() {
+        ArrayList<String> prodRow = new ArrayList();
+        prodRow.add(this.getProductName());
+        prodRow.add(String.valueOf(this.getPrice()));
+        prodRow.add(this.getDescription());
+        prodRow.add(String.valueOf(this.getProcessor()));
+        prodRow.add(String.valueOf(this.getRam()));
+        prodRow.add(String.valueOf(this.getHarddrivesSize()));
+        prodRow.add(this.getFormfactor());
+        prodRow.add(String.valueOf(this.integratedWifi));
+                
+        return prodRow;
+    }
+    
+    @Override
+    public String toString(){
+        return "Desktop: "+ this.getProductName()+ " PROCESSOR: " +this.getProcessor();
+    }
+    
 }

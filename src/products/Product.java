@@ -5,6 +5,8 @@
  */
 package products;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author Jakob
@@ -15,6 +17,10 @@ public abstract class Product {
     private String productName;
     private double price;
     private String description;
+    private String firstAtt;
+    
+    
+    
     
     public Product(int productId, String productName, double price, String productDesc){
         this.productId = productId;
@@ -55,5 +61,11 @@ public abstract class Product {
         this.description = description;
     }
     
+    @Override
+    public String toString(){
+        return "This product is named: " + productName;
+    }
+    
+    public abstract ArrayList<String> getProductRow();
 
 }
