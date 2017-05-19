@@ -5,6 +5,8 @@
  */
 package products;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author Jakob
@@ -12,14 +14,15 @@ package products;
 public class Laptop extends Computer {
 
     private double screenSize;
-    private int weight;
+    private double weight;
     private int batteryLife;
 
-    public Laptop(double screenSize, int weight, int batteryLife, double processor, int ram, int harddrivesSize, int productId, String productName, double price, String productDesc) {
+    public Laptop(double screenSize, double weight, int batteryLife, double processor, int ram, int harddrivesSize, int productId, String productName, double price, String productDesc) {
         super(processor, ram, harddrivesSize, productId, productName, price, productDesc);
         this.screenSize = screenSize;
         this.weight = weight;
         this.batteryLife = batteryLife;
+
     }
 
     public double getScreenSize() {
@@ -30,7 +33,7 @@ public class Laptop extends Computer {
         this.screenSize = screenSize;
     }
 
-    public int getWeight() {
+    public double getWeight() {
         return weight;
     }
 
@@ -44,6 +47,22 @@ public class Laptop extends Computer {
 
     public void setBatteryLife(int batteryLife) {
         this.batteryLife = batteryLife;
+    }
+
+    @Override
+    public ArrayList<String> getProductRow() {
+        ArrayList<String> prodRow = new ArrayList();
+        prodRow.add(this.getProductName());
+        prodRow.add(String.valueOf(this.getPrice()));
+        prodRow.add(this.getDescription());
+        prodRow.add(String.valueOf(this.getProcessor()));
+        prodRow.add(String.valueOf(this.getRam()));
+        prodRow.add(String.valueOf(this.getHarddrivesSize()));
+        prodRow.add(String.valueOf(this.getScreenSize()));
+        prodRow.add(String.valueOf(this.getWeight()));
+        prodRow.add(String.valueOf(this.getBatteryLife()));
+
+        return prodRow;
     }
 
 }

@@ -5,12 +5,14 @@
  */
 package products;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author Jakob
  */
-public class Tv extends TvRadio{
-    
+public class Tv extends TvRadio {
+
     private double screenSize;
     private String resolution;
     private String panelType;
@@ -20,6 +22,7 @@ public class Tv extends TvRadio{
         this.screenSize = screenSize;
         this.resolution = resolution;
         this.panelType = panelType;
+
     }
 
     public double getScreenSize() {
@@ -45,7 +48,20 @@ public class Tv extends TvRadio{
     public void setPanelType(String panelType) {
         this.panelType = panelType;
     }
-    
-    
-    
+
+    @Override
+    public ArrayList<String> getProductRow() {
+        ArrayList<String> prodRow = new ArrayList();
+        prodRow.add(this.getProductName());
+        prodRow.add(String.valueOf(this.getPrice()));
+        prodRow.add(this.getDescription());
+        prodRow.add(String.valueOf(this.getSoundLevel()));
+        prodRow.add(this.getColor());
+        prodRow.add(String.valueOf(this.getScreenSize()));
+        prodRow.add(this.getResolution());
+        prodRow.add(this.getPanelType());
+
+        return prodRow;
+    }
+
 }

@@ -5,6 +5,8 @@
  */
 package products;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author Jakob
@@ -18,6 +20,7 @@ public class WashingMachine extends WhiteGoods {
         super(noiseLevel, energyUsage, productId, productName, price, productDesc);
         this.rpm = rpm;
         this.capacity = capacity;
+
     }
 
     public int getRpm() {
@@ -36,4 +39,17 @@ public class WashingMachine extends WhiteGoods {
         this.capacity = capacity;
     }
 
+    @Override
+    public ArrayList<String> getProductRow() {
+        ArrayList<String> prodRow = new ArrayList();
+        prodRow.add(this.getProductName());
+        prodRow.add(String.valueOf(this.getPrice()));
+        prodRow.add(this.getDescription());
+        prodRow.add(String.valueOf(this.getNoiseLevel()));
+        prodRow.add(String.valueOf(this.getEnergyUsage()));
+        prodRow.add(String.valueOf(this.getRpm()));
+        prodRow.add(String.valueOf(this.getCapacity()));
+
+        return prodRow;
+    }
 }

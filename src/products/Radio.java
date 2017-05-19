@@ -5,11 +5,13 @@
  */
 package products;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author Jakob
  */
-public abstract class Radio extends TvRadio {
+public class Radio extends TvRadio {
 
     private int batteryLife;
     private int effect;
@@ -18,6 +20,7 @@ public abstract class Radio extends TvRadio {
         super(soundLevel, color, productId, productName, price, productDesc);
         this.batteryLife = batteryLife;
         this.effect = effect;
+
     }
 
     public int getBatteryLife() {
@@ -34,6 +37,20 @@ public abstract class Radio extends TvRadio {
 
     public void setEffect(int effect) {
         this.effect = effect;
+    }
+
+    @Override
+    public ArrayList<String> getProductRow() {
+        ArrayList<String> prodRow = new ArrayList();
+        prodRow.add(this.getProductName());
+        prodRow.add(String.valueOf(this.getPrice()));
+        prodRow.add(this.getDescription());
+        prodRow.add(String.valueOf(this.getSoundLevel()));
+        prodRow.add(this.getColor());
+        prodRow.add(String.valueOf(this.getBatteryLife()));
+        prodRow.add(String.valueOf(this.getEffect()));
+
+        return prodRow;
     }
 
 }
