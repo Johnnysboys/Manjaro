@@ -150,19 +150,29 @@ public class ProductConnector extends SuperDB {
                 pList.add(desk);
             } else if (category.equals("laptops")) {
                 prod = new Laptop(rs.getDouble("screensize"), rs.getDouble("weight"), rs.getInt("battery"), rs.getDouble("processor"), rs.getInt("ram"), rs.getInt("harddrive"), rs.getInt("id"), rs.getString("name"), rs.getDouble("price"), rs.getString("description"));
+                Laptop lap = (Laptop) prod;
+                pList.add(lap);
             } else if (category.equals("washingmachine")) {
                 prod = new WashingMachine(rs.getInt("rpm"), rs.getDouble("capacity"), rs.getInt("noiselevel"), rs.getInt("energyusage"), rs.getInt("id"), rs.getString("name"), rs.getDouble("price"), rs.getString("description"));
+                WashingMachine wash = (WashingMachine) prod;
+                pList.add(wash);
             } else if (category.equals("fridges")) {
                 prod = new Fridge(rs.getDouble("volume"), rs.getInt("shelf"), rs.getInt("noiselevel"), rs.getInt("energyusage"), rs.getInt("id"), rs.getString("name"), rs.getDouble("price"), rs.getString("description"));
+                Fridge fridge = (Fridge) prod;
+                pList.add(fridge);
             } else if (category.equals("tv")) {
                 prod = new Tv(rs.getDouble("screensize"), rs.getString("resolution"), rs.getString("paneltype"), rs.getInt("soundlevel"), rs.getString("color"), rs.getInt("id"), rs.getString("name"), rs.getDouble("price"), rs.getString("description"));
+                Tv tv = (Tv) prod;
+                pList.add(tv);
             } else if (category.equals("radio")) {
                 prod = new Radio(rs.getInt("battery"), rs.getInt("effect"), rs.getInt("soundlevel"), rs.getString("color"), rs.getInt("id"), rs.getString("name"), rs.getDouble("price"), rs.getString("description"));
+                Radio rad = (Radio) prod;
+                pList.add(rad);
             }
 
 //            pList.add(desk);
-            prod.toString();
-            pList.add(prod);
+//            prod.toString();
+//            pList.add(prod);
 
         }
 

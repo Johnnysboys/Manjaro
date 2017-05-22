@@ -13,11 +13,16 @@ import electroshop.persons.Person;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -26,11 +31,18 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.MapValueFactory;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.Pane;
+import javafx.util.Callback;
+import javafx.util.StringConverter;
 import products.Product;
 import products.Computer;
 import products.Desktop;
@@ -132,7 +144,44 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private Button searchButton;
     @FXML
-    private TableView<Product> productTable;
+    private TableView productTable;
+    @FXML
+    private TextArea productDescArea;
+    @FXML
+    private TableView basketView;
+    @FXML
+    private Button updateBasketButton;
+
+    @FXML
+    private void handleBasketUpdate(ActionEvent event) {
+        basketView.getColumns().clear();
+
+        TableColumn<Map.Entry<Product, String>, String> column1 = new TableColumn<>("Product Name");
+        column1.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Map.Entry<Product, String>, String>, ObservableValue<String>>() {
+
+            @Override
+            public ObservableValue<String> call(TableColumn.CellDataFeatures<Map.Entry<Product, String>, String> p) {
+
+                return new SimpleStringProperty(p.getValue().getKey().getProductName());
+            }
+        });
+
+        TableColumn<Map.Entry<String, String>, String> column2 = new TableColumn<>("Quantity");
+        column2.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Map.Entry<String, String>, String>, ObservableValue<String>>() {
+
+            @Override
+            public ObservableValue<String> call(TableColumn.CellDataFeatures<Map.Entry<String, String>, String> p) {
+
+                return new SimpleStringProperty(p.getValue().getValue());
+            }
+        });
+
+        ObservableList<Map.Entry<String, String>> items = FXCollections.observableArrayList(activeUser.getBasket().getProductMap().entrySet());
+
+        basketView.getColumns().setAll(column1, column2);
+
+        basketView.setItems(items);
+    }
 
     @FXML
     private void handleLogin(ActionEvent event) throws SQLException {
@@ -156,7 +205,6 @@ public class FXMLDocumentController implements Initializable {
             userInfoLabel.setText(sb.toString());
             loggedInPane.setVisible(true);
 
-            //productTable.
         }
 
     }
@@ -174,151 +222,185 @@ public class FXMLDocumentController implements Initializable {
         String col6 = column6Field.getText();
 
         prodSearch = FXCollections.observableArrayList(prodCon.findProducts(category, catColumnsList, name, price, col1, col2, col3, col4, col5, col6));
-        if(prodSearch == null){
+        if (prodSearch == null) {
             System.out.println("No products found"); // WHAT DO WE DO 
             return;
         }
-        
-        
-        
+
         productTable.setEditable(true);
         int columnAmount = catColumnsList.size();
         System.out.println(columnAmount);
         productTable.getColumns().clear();
 
-        if (columnAmount == 4) {
-            System.out.println("printing 4 columns");
-            TableColumn c1 = new TableColumn(catColumnsList.get(1));
-            TableColumn c2 = new TableColumn(catColumnsList.get(2));
-            TableColumn c3 = new TableColumn(catColumnsList.get(3));
-            productTable.getColumns().addAll(c1, c2, c3);
-            
-            c1.setCellValueFactory (new PropertyValueFactory<Product, String>("productName"));
-            c2.setCellValueFactory (new PropertyValueFactory<Product, String>("price"));
-            c3.setCellValueFactory (new PropertyValueFactory<Product, String>("description"));
-           
-           
-        } else if (columnAmount == 5) {
-            System.out.println("printing 5 columns");
-            TableColumn c1 = new TableColumn(catColumnsList.get(1));
-            TableColumn c2 = new TableColumn(catColumnsList.get(2));
-            TableColumn c3 = new TableColumn(catColumnsList.get(3));
-            TableColumn c4 = new TableColumn(catColumnsList.get(4));
-            productTable.getColumns().addAll(c1, c2, c3, c4);
-            
-            
-            c1.setCellValueFactory (new PropertyValueFactory<Product, String>("productName"));
-            c2.setCellValueFactory (new PropertyValueFactory<Product, String>("price"));
-            c3.setCellValueFactory (new PropertyValueFactory<Product, String>("description"));
-            c4.setCellValueFactory (new PropertyValueFactory<Product, String>("firstAtt"));
-        } else if (columnAmount == 6) {
-            System.out.println("printing 6 columns");
-            TableColumn c1 = new TableColumn(catColumnsList.get(1));
-            TableColumn c2 = new TableColumn(catColumnsList.get(2));
-            TableColumn c3 = new TableColumn(catColumnsList.get(3));
-            TableColumn c4 = new TableColumn(catColumnsList.get(4));
-            TableColumn c5 = new TableColumn(catColumnsList.get(5));
-            productTable.getColumns().addAll(c1, c2, c3, c4, c5);
-            
-            
-            
-            c1.setCellValueFactory (new PropertyValueFactory<Product, String>("productName"));
-            c2.setCellValueFactory (new PropertyValueFactory<Product, String>("price"));
-            c3.setCellValueFactory (new PropertyValueFactory<Product, String>("description"));            
-            c4.setCellValueFactory (new PropertyValueFactory<Product, String>("firstAtt"));
-            c5.setCellValueFactory (new PropertyValueFactory<Product, String>("secondAtt"));
-        } else if (columnAmount == 7){
-            System.out.println("printing 7 columns");
-            TableColumn c1 = new TableColumn(catColumnsList.get(1));
-            TableColumn c2 = new TableColumn(catColumnsList.get(2));
-            TableColumn c3 = new TableColumn(catColumnsList.get(3));
-            TableColumn c4 = new TableColumn(catColumnsList.get(4));
-            TableColumn c5 = new TableColumn(catColumnsList.get(5));
-            TableColumn c6 = new TableColumn(catColumnsList.get(6));
-            productTable.getColumns().addAll(c1, c2, c3, c4, c5, c6);
-            
-            
-            c1.setCellValueFactory (new PropertyValueFactory<Product, String>("productName"));
-            c2.setCellValueFactory (new PropertyValueFactory<Product, String>("price"));
-            c3.setCellValueFactory (new PropertyValueFactory<Product, String>("description"));
-            c4.setCellValueFactory (new PropertyValueFactory<Product, String>("firstAtt"));
-            c5.setCellValueFactory (new PropertyValueFactory<Product, String>("secondAtt"));
-            c6.setCellValueFactory (new PropertyValueFactory<Product, String>("thirdAtt"));
-        } else if (columnAmount == 8) {
-            System.out.println("printing 8 columns");
-            TableColumn c1 = new TableColumn(catColumnsList.get(1));
-            TableColumn c2 = new TableColumn(catColumnsList.get(2));
-            TableColumn c3 = new TableColumn(catColumnsList.get(3));
-            TableColumn c4 = new TableColumn(catColumnsList.get(4));
-            TableColumn c5 = new TableColumn(catColumnsList.get(5));
-            TableColumn c6 = new TableColumn(catColumnsList.get(6));
-            TableColumn c7 = new TableColumn(catColumnsList.get(7));
-            
-            c1.setCellValueFactory (new PropertyValueFactory<Product, String>("productName"));
-            c2.setCellValueFactory (new PropertyValueFactory<Product, String>("price"));
-            c3.setCellValueFactory (new PropertyValueFactory<Product, String>("description"));
-            c4.setCellValueFactory (new PropertyValueFactory<Product, String>("firstAtt"));
-            c5.setCellValueFactory (new PropertyValueFactory<Product, String>("secondAtt"));
-            c6.setCellValueFactory (new PropertyValueFactory<Product, String>("thirdAtt"));
-            c7.setCellValueFactory (new PropertyValueFactory<Product, String>("forthAtt"));
-            
-            productTable.getColumns().addAll(c1, c2, c3, c4, c5, c6, c7);
-        } else if (columnAmount == 9){
-            System.out.println("printing 9 columns");
-            TableColumn c1 = new TableColumn(catColumnsList.get(1));
-            TableColumn c2 = new TableColumn(catColumnsList.get(2));
-            TableColumn c3 = new TableColumn(catColumnsList.get(3));
-            TableColumn c4 = new TableColumn(catColumnsList.get(4));
-            TableColumn c5 = new TableColumn(catColumnsList.get(5));
-            TableColumn c6 = new TableColumn(catColumnsList.get(6));
-            TableColumn c7 = new TableColumn(catColumnsList.get(7));
-            TableColumn c8 = new TableColumn(catColumnsList.get(8));
-            productTable.getColumns().addAll(c1, c2, c3, c4, c5, c6, c7, c8);
-            
-            c1.setCellValueFactory (new PropertyValueFactory<Product, String>("productName"));
-            c2.setCellValueFactory (new PropertyValueFactory<Product, String>("price"));
-            c3.setCellValueFactory (new PropertyValueFactory<Product, String>("description"));
-            c4.setCellValueFactory (new PropertyValueFactory<Product, String>("processor"));
-            c5.setCellValueFactory (new PropertyValueFactory<Product, String>("secondAtt"));
-            c6.setCellValueFactory (new PropertyValueFactory<Product, String>("thirdAtt"));
-            c7.setCellValueFactory (new PropertyValueFactory<Product, String>("forthAtt"));
-            c8.setCellValueFactory (new PropertyValueFactory<Product, String>("fifthAtt"));
-            
-            
-        } else {
-            System.out.println("printing 10 columns");
-            TableColumn c1 = new TableColumn(catColumnsList.get(1));
-            TableColumn c2 = new TableColumn(catColumnsList.get(2));
-            TableColumn c3 = new TableColumn(catColumnsList.get(3));
-            TableColumn c4 = new TableColumn(catColumnsList.get(4));
-            TableColumn c5 = new TableColumn(catColumnsList.get(5));
-            TableColumn c6 = new TableColumn(catColumnsList.get(6));
-            TableColumn c7 = new TableColumn(catColumnsList.get(7));
-            TableColumn c8 = new TableColumn(catColumnsList.get(8));
-            TableColumn c9 = new TableColumn(catColumnsList.get(9));
-            productTable.getColumns().addAll(c1, c2, c3, c4, c5, c6, c7, c8, c9);
-            
-            
-            c1.setCellValueFactory (new PropertyValueFactory<Product, String>("productName"));
-            c2.setCellValueFactory (new PropertyValueFactory<Product, String>("price"));
-            c3.setCellValueFactory (new PropertyValueFactory<Product, String>("description"));
-            c4.setCellValueFactory (new PropertyValueFactory<Product, String>("firstAtt"));
-            c5.setCellValueFactory (new PropertyValueFactory<Product, String>("secondAtt"));
-            c6.setCellValueFactory (new PropertyValueFactory<Product, String>("thirdAtt"));
-            c7.setCellValueFactory (new PropertyValueFactory<Product, String>("forthAtt"));
-            c8.setCellValueFactory (new PropertyValueFactory<Product, String>("fifthAtt"));
-            c9.setCellValueFactory (new PropertyValueFactory<Product, String>("sixthAtt"));
+        switch (category) {
+            case "desktops": {
+                TableColumn c1 = new TableColumn(catColumnsList.get(1));
+                TableColumn c2 = new TableColumn(catColumnsList.get(2));
+                TableColumn c4 = new TableColumn(catColumnsList.get(4));
+                TableColumn c5 = new TableColumn(catColumnsList.get(5));
+                TableColumn c6 = new TableColumn(catColumnsList.get(6));
+                TableColumn c7 = new TableColumn(catColumnsList.get(7));
+                TableColumn c8 = new TableColumn(catColumnsList.get(8));
+
+                productTable.getColumns().addAll(c1, c2, c4, c5, c6, c7, c8);
+
+                c1.setCellValueFactory(new PropertyValueFactory<Product, String>("productName"));
+                c2.setCellValueFactory(new PropertyValueFactory<Product, String>("price"));
+                c4.setCellValueFactory(new PropertyValueFactory<Product, String>("processor"));
+                c5.setCellValueFactory(new PropertyValueFactory<Product, String>("ram"));
+                c6.setCellValueFactory(new PropertyValueFactory<Product, String>("harddrivesSize"));
+                c7.setCellValueFactory(new PropertyValueFactory<Product, String>("formfactor"));
+                c8.setCellValueFactory(new PropertyValueFactory<Product, String>("integratedWifi"));
+                break;
+            }
+            case "washingmachine": {
+                TableColumn c1 = new TableColumn(catColumnsList.get(1));
+                TableColumn c2 = new TableColumn(catColumnsList.get(2));
+                TableColumn c4 = new TableColumn(catColumnsList.get(4));
+                TableColumn c5 = new TableColumn(catColumnsList.get(5));
+                TableColumn c6 = new TableColumn(catColumnsList.get(6));
+                TableColumn c7 = new TableColumn(catColumnsList.get(7));
+
+                productTable.getColumns().addAll(c1, c2, c4, c5, c6, c7);
+                c1.setCellValueFactory(new PropertyValueFactory<Product, String>("productName"));
+                c2.setCellValueFactory(new PropertyValueFactory<Product, String>("price"));
+                c4.setCellValueFactory(new PropertyValueFactory<Product, String>("noiseLevel"));
+                c5.setCellValueFactory(new PropertyValueFactory<Product, String>("energyUsage"));
+                c6.setCellValueFactory(new PropertyValueFactory<Product, String>("rpm"));
+                c7.setCellValueFactory(new PropertyValueFactory<Product, String>("capacity"));
+                break;
+            }
+            case "fridges": {
+                TableColumn c1 = new TableColumn(catColumnsList.get(1));
+                TableColumn c2 = new TableColumn(catColumnsList.get(2));
+                TableColumn c4 = new TableColumn(catColumnsList.get(4));
+                TableColumn c5 = new TableColumn(catColumnsList.get(5));
+                TableColumn c6 = new TableColumn(catColumnsList.get(6));
+                TableColumn c7 = new TableColumn(catColumnsList.get(7));
+
+                productTable.getColumns().addAll(c1, c2, c4, c5, c6, c7);
+                c1.setCellValueFactory(new PropertyValueFactory<Product, String>("productName"));
+                c2.setCellValueFactory(new PropertyValueFactory<Product, String>("price"));
+                c4.setCellValueFactory(new PropertyValueFactory<Product, String>("noiseLevel"));
+                c5.setCellValueFactory(new PropertyValueFactory<Product, String>("energyUsage"));
+                c6.setCellValueFactory(new PropertyValueFactory<Product, String>("volume"));
+                c7.setCellValueFactory(new PropertyValueFactory<Product, String>("shelfs"));
+                break;
+            }
+            case "tv": {
+                TableColumn c1 = new TableColumn(catColumnsList.get(1));
+                TableColumn c2 = new TableColumn(catColumnsList.get(2));
+                TableColumn c4 = new TableColumn(catColumnsList.get(4));
+                TableColumn c5 = new TableColumn(catColumnsList.get(5));
+                TableColumn c6 = new TableColumn(catColumnsList.get(6));
+                TableColumn c7 = new TableColumn(catColumnsList.get(7));
+                TableColumn c8 = new TableColumn(catColumnsList.get(8));
+
+                productTable.getColumns().addAll(c1, c2, c4, c5, c6, c7, c8);
+                c1.setCellValueFactory(new PropertyValueFactory<Product, String>("productName"));
+                c2.setCellValueFactory(new PropertyValueFactory<Product, String>("price"));
+                c4.setCellValueFactory(new PropertyValueFactory<Product, String>("soundLevel"));
+                c5.setCellValueFactory(new PropertyValueFactory<Product, String>("color"));
+                c6.setCellValueFactory(new PropertyValueFactory<Product, String>("screenSize"));
+                c7.setCellValueFactory(new PropertyValueFactory<Product, String>("resolution"));
+                c8.setCellValueFactory(new PropertyValueFactory<Product, String>("panelType"));
+                break;
+            }
+            case "radio": {
+                TableColumn c1 = new TableColumn(catColumnsList.get(1));
+                TableColumn c2 = new TableColumn(catColumnsList.get(2));
+                TableColumn c4 = new TableColumn(catColumnsList.get(4));
+                TableColumn c5 = new TableColumn(catColumnsList.get(5));
+                TableColumn c6 = new TableColumn(catColumnsList.get(6));
+                TableColumn c7 = new TableColumn(catColumnsList.get(7));
+
+                productTable.getColumns().addAll(c1, c2, c4, c5, c6, c7);
+                c1.setCellValueFactory(new PropertyValueFactory<Product, String>("productName"));
+                c2.setCellValueFactory(new PropertyValueFactory<Product, String>("price"));
+                c4.setCellValueFactory(new PropertyValueFactory<Product, String>("soundLevel"));
+                c5.setCellValueFactory(new PropertyValueFactory<Product, String>("color"));
+                c6.setCellValueFactory(new PropertyValueFactory<Product, String>("batteryLife"));
+                c7.setCellValueFactory(new PropertyValueFactory<Product, String>("effect"));
+                break;
+            }
+            case "laptops": {
+                TableColumn c1 = new TableColumn(catColumnsList.get(1));
+                TableColumn c2 = new TableColumn(catColumnsList.get(2));
+                TableColumn c4 = new TableColumn(catColumnsList.get(4));
+                TableColumn c5 = new TableColumn(catColumnsList.get(5));
+                TableColumn c6 = new TableColumn(catColumnsList.get(6));
+                TableColumn c7 = new TableColumn(catColumnsList.get(7));
+                TableColumn c8 = new TableColumn(catColumnsList.get(8));
+                TableColumn c9 = new TableColumn(catColumnsList.get(9));
+
+                productTable.getColumns().addAll(c1, c2, c4, c5, c6, c7, c8, c9);
+                c1.setCellValueFactory(new PropertyValueFactory<Product, String>("productName"));
+                c2.setCellValueFactory(new PropertyValueFactory<Product, String>("price"));
+                c4.setCellValueFactory(new PropertyValueFactory<Product, String>("processor"));
+                c5.setCellValueFactory(new PropertyValueFactory<Product, String>("ram"));
+                c6.setCellValueFactory(new PropertyValueFactory<Product, String>("harddrivesSize"));
+                c7.setCellValueFactory(new PropertyValueFactory<Product, String>("screenSize"));
+                c8.setCellValueFactory(new PropertyValueFactory<Product, String>("weight"));
+                c9.setCellValueFactory(new PropertyValueFactory<Product, String>("batteryLife"));
+                break;
+            }
+            default:
+                System.out.println("Category not recognized.");
+                break;
         }
+        TableColumn actionCol = new TableColumn(" ");
+        actionCol.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
 
-        int a = prodSearch.size();
-        System.out.println("Showing "+a+" products.");
-        
-        
+        Callback<TableColumn<Product, String>, TableCell<Product, String>> cellFactory
+                = //
+                new Callback<TableColumn<Product, String>, TableCell<Product, String>>() {
+            @Override
+            public TableCell call(final TableColumn<Product, String> param) {
+                final TableCell<Product, String> cell = new TableCell<Product, String>() {
 
-        // productTable.getColumns().addAll(catColumnsList.get(0));
-        //prodSearch = prodCon.findProducts(category, catColumnsList, name, price, col1, col2, col3, col4, col5, col6);
+                    final Button btn = new Button("Add to Basket");
+
+                    @Override
+                    public void updateItem(String item, boolean empty) {
+                        if (empty) {
+                            setGraphic(null);
+                            setText(null);
+                        } else {
+                            btn.setOnAction((ActionEvent event)
+                                    -> {
+                                Product product = getTableView().getItems().get(getIndex());
+                                activeUser.getBasket().addProduct(product, "1");
+                            });
+                            setGraphic(btn);
+                            setText(null);
+                        }
+                    }
+                };
+                return cell;
+            }
+        };
+
+        actionCol.setCellFactory(cellFactory);
+
+        productTable.getColumns().add(actionCol);
+
+        productTable.setRowFactory(tableView -> {
+            final TableRow<Product> row = new TableRow<>();
+
+            row.hoverProperty().addListener((observable) -> {
+                final Product product = row.getItem();
+                productDescArea.clear();
+                if (row.isHover() && product != null) {
+                    productDescArea.setText(product.getDescription());
+                } else {
+                    productDescArea.setText("Hover over a product to see its description.");
+                }
+            });
+
+            return row;
+        });
+
         productTable.setItems(prodSearch);
-        //System.out.println(prodCon.findProducts(category, catColumnsList, name, price, col1, col2, col3, col4, col5, col6));
     }
 
     @FXML
@@ -393,7 +475,6 @@ public class FXMLDocumentController implements Initializable {
                 break;
 
         }
-
     }
 
     @FXML
