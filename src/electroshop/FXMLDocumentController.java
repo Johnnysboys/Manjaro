@@ -67,6 +67,9 @@ public class FXMLDocumentController implements Initializable {
     private ProductConnector prodCon;
     private ArrayList<String> catColumnsList;
     private ObservableList<Product> prodSearch;
+    ObservableList<Order> orderList = FXCollections.observableArrayList();
+    
+    
 
     @FXML
     private Pane loginPane;
@@ -164,6 +167,10 @@ public class FXMLDocumentController implements Initializable {
     private TableView<Order> orderView;
     @FXML
     private Button showOrderButton;
+    @FXML
+    private TableView<Product> orderProdView;
+    @FXML
+    private Button baskerOrderButton;
 
     @FXML
     private void handleBasketUpdate(ActionEvent event) {
@@ -411,7 +418,7 @@ public class FXMLDocumentController implements Initializable {
                                     -> {
                                 Product product = getTableView().getItems().get(getIndex());
                                 activeUser.getBasket().addProduct(product, "1");
-                                });
+                            });
                             setGraphic(btn);
                             setText(null);
                         }
@@ -444,27 +451,60 @@ public class FXMLDocumentController implements Initializable {
 
         productTable.setItems(prodSearch);
     }
-    
+
     @FXML
     private void showOrderHistory() {
-        ObservableList<Order> orderList = FXCollections.observableArrayList();
+       // ObservableList<Order> orderList = FXCollections.observableArrayList();
         orderView.getColumns().clear();
-        
+
         TableColumn orderNumber = new TableColumn("Order ID");
         TableColumn orderPrice = new TableColumn("Price Total");
         TableColumn orderDate = new TableColumn("Date");
 
-        orderList.add(new Order(1, 2.00, true));
-        orderList.add(new Order(1, 1500.00, true));
-        orderList.add(new Order(1, 20.00, true));
+//        orderList.add(new Order(1, 2.00, true));
+//        orderList.add(new Order(1, 1500.00, true));
+//        orderList.add(new Order(1, 20.00, true));
         orderNumber.setCellValueFactory(new PropertyValueFactory<>("orderID"));
         orderPrice.setCellValueFactory(new PropertyValueFactory("priceTotal"));
         orderDate.setCellValueFactory(new PropertyValueFactory("orderDate"));
-        
+
         orderView.getColumns().addAll(orderNumber, orderPrice, orderDate);
-        
+
+        orderView.setRowFactory(tableView -> {
+            final TableRow<Order> row = new TableRow<>();
+
+            row.hoverProperty().addListener((observable) -> {
+                final Order order = row.getItem();
+                System.out.println("beeee");
+                if (row.isHover() && order != null) {
+                    this.fixOrderHover(order.getKeySet());
+                } else {
+                    //productDescArea.setText("Hover over a product to see its description.");
+                }
+            });
+
+            return row;
+        });
+
         orderView.setItems(orderList);
 
+    }
+    
+    private void fixOrderHover(ObservableList<Product> p){
+        orderProdView.getColumns().clear();
+        
+        TableColumn productName = new TableColumn("Name");
+        
+        productName.setCellValueFactory(new PropertyValueFactory<>("productName"));
+        orderProdView.getColumns().add(productName);
+        orderProdView.setItems(p);
+    }
+    
+    @FXML
+    private void makeOrderHandler(ActionEvent event){
+        Order order = new Order(activeUser.getBasket());
+        
+        orderList.add(order);
     }
 
     @FXML
