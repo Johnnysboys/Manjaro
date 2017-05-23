@@ -31,6 +31,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -151,9 +152,31 @@ public class FXMLDocumentController implements Initializable {
     private TableView basketView;
     @FXML
     private Button updateBasketButton;
+    @FXML
+    private Button removeFromBasket;
+    @FXML
+    private Label totalLabel;
+    @FXML
+    private Label signErrorLabel;
+    @FXML
+    private Tab orderHistTab;
+    @FXML
+    private TableView<Order> orderView;
+    @FXML
+    private Button showOrderButton;
 
     @FXML
     private void handleBasketUpdate(ActionEvent event) {
+        this.updateBasket();
+    }
+
+    @FXML
+    private void clearBasket(ActionEvent event) {
+        activeUser.getBasket().emptyBasket();
+        this.updateBasket();
+    }
+
+    private void updateBasket() {
         basketView.getColumns().clear();
 
         TableColumn<Map.Entry<Product, String>, String> column1 = new TableColumn<>("Product Name");
@@ -166,8 +189,18 @@ public class FXMLDocumentController implements Initializable {
             }
         });
 
-        TableColumn<Map.Entry<String, String>, String> column2 = new TableColumn<>("Quantity");
-        column2.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Map.Entry<String, String>, String>, ObservableValue<String>>() {
+        TableColumn<Map.Entry<Product, String>, String> column2 = new TableColumn<>("Price");
+        column2.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Map.Entry<Product, String>, String>, ObservableValue<String>>() {
+
+            @Override
+            public ObservableValue<String> call(TableColumn.CellDataFeatures<Map.Entry<Product, String>, String> p) {
+
+                return new SimpleStringProperty(String.valueOf(p.getValue().getKey().getPrice()));
+            }
+        });
+
+        TableColumn<Map.Entry<String, String>, String> column3 = new TableColumn<>("Quantity");
+        column3.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Map.Entry<String, String>, String>, ObservableValue<String>>() {
 
             @Override
             public ObservableValue<String> call(TableColumn.CellDataFeatures<Map.Entry<String, String>, String> p) {
@@ -178,9 +211,15 @@ public class FXMLDocumentController implements Initializable {
 
         ObservableList<Map.Entry<String, String>> items = FXCollections.observableArrayList(activeUser.getBasket().getProductMap().entrySet());
 
-        basketView.getColumns().setAll(column1, column2);
+        column1.setMaxWidth(200);
+        column2.setMaxWidth(75);
+        column3.setMaxWidth(75);
+        basketView.setMaxWidth(350);
+
+        basketView.getColumns().setAll(column1, column2, column3);
 
         basketView.setItems(items);
+        totalLabel.setText(String.valueOf(activeUser.getBasket().getTotal()));
     }
 
     @FXML
@@ -348,6 +387,8 @@ public class FXMLDocumentController implements Initializable {
                 System.out.println("Category not recognized.");
                 break;
         }
+
+        //Button column
         TableColumn actionCol = new TableColumn(" ");
         actionCol.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
 
@@ -370,7 +411,7 @@ public class FXMLDocumentController implements Initializable {
                                     -> {
                                 Product product = getTableView().getItems().get(getIndex());
                                 activeUser.getBasket().addProduct(product, "1");
-                            });
+                                });
                             setGraphic(btn);
                             setText(null);
                         }
@@ -384,6 +425,7 @@ public class FXMLDocumentController implements Initializable {
 
         productTable.getColumns().add(actionCol);
 
+        //Row Hover Mechanic
         productTable.setRowFactory(tableView -> {
             final TableRow<Product> row = new TableRow<>();
 
@@ -401,6 +443,28 @@ public class FXMLDocumentController implements Initializable {
         });
 
         productTable.setItems(prodSearch);
+    }
+    
+    @FXML
+    private void showOrderHistory() {
+        ObservableList<Order> orderList = FXCollections.observableArrayList();
+        orderView.getColumns().clear();
+        
+        TableColumn orderNumber = new TableColumn("Order ID");
+        TableColumn orderPrice = new TableColumn("Price Total");
+        TableColumn orderDate = new TableColumn("Date");
+
+        orderList.add(new Order(1, 2.00, true));
+        orderList.add(new Order(1, 1500.00, true));
+        orderList.add(new Order(1, 20.00, true));
+        orderNumber.setCellValueFactory(new PropertyValueFactory<>("orderID"));
+        orderPrice.setCellValueFactory(new PropertyValueFactory("priceTotal"));
+        orderDate.setCellValueFactory(new PropertyValueFactory("orderDate"));
+        
+        orderView.getColumns().addAll(orderNumber, orderPrice, orderDate);
+        
+        orderView.setItems(orderList);
+
     }
 
     @FXML
@@ -482,7 +546,7 @@ public class FXMLDocumentController implements Initializable {
         loggedInPane.setVisible(false);
         loginPane.setVisible(true);
 
-        activeUser = new Visitor();
+        activeUser = new Visitor(activeUser.getBasket());
     }
 
     @FXML
@@ -494,10 +558,15 @@ public class FXMLDocumentController implements Initializable {
         String pw = pwEntry.getText();
 
         if (Checker.checkAccount(email, name, phone) == true) {
-            accCon.insertAccount(email, name, phone, address, pw);
+            if (accCon.accountExists(email)) {
+                signErrorLabel.setText("An account with this email already exists.");
+            } else {
+                accCon.insertAccount(email, name, phone, address, pw);
+                signErrorLabel.setText("Your account has been created. Enjoy!");
+            }
+
         } else {
-            // Grafisk visning af fejl i account creation
-            System.out.println("something is wrong");
+            signErrorLabel.setText("Some of the entered information is invalid");
         }
 
     }
@@ -505,7 +574,6 @@ public class FXMLDocumentController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         activeUser = new Visitor();
-        //accCon = new AccountsConnector("jdbc:postgresql://localhost:5432/electroshop", "postgres", "2111993");
         accCon = new AccountsConnector("jdbc:postgresql://151.80.57.19:5432/admin_semester", "admin_willf", "2111993");
         prodCon = new ProductConnector("jdbc:postgresql://151.80.57.19:5432/admin_semester", "admin_willf", "2111993");
 

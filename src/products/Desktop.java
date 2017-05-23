@@ -58,7 +58,7 @@ public class Desktop extends Computer {
     
     @Override
     public String toString(){
-        return "Desktop: "+ this.getProductName()+ " PROCESSOR: " +this.getProcessor();
+        return "Desktop: "+ this.getProductName()+ " PROCESSOR: " +this.getProcessor()+"                ";
     }
     
 }
