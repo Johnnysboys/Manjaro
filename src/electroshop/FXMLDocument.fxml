@@ -132,7 +132,7 @@
                           </columns>
                         </TableView>
                         <Button fx:id="showOrderButton" layoutX="14.0" layoutY="408.0" mnemonicParsing="false" onAction="#showOrderHistory" text="Show Orders" />
-                        <TableView fx:id="orderProdView" layoutX="558.0" layoutY="65.0" prefHeight="200.0" prefWidth="200.0">
+                        <TableView fx:id="orderProdView" layoutX="486.0" layoutY="14.0" prefHeight="239.0" prefWidth="279.0">
                           <columns>
                             <TableColumn prefWidth="75.0" text="C1" />
                             <TableColumn prefWidth="75.0" text="C2" />

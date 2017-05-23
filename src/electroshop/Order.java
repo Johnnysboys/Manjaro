@@ -32,6 +32,7 @@ public class Order {
     public Order(Basket basket) {
         this.productMap = basket.getProductMap();
         this.priceTotal = basket.getTotal();
+        this.orderDate = new Date();
     }
     
     public Order(Basket basket, int orderID) {

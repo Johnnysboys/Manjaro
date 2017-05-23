@@ -168,7 +168,7 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private Button showOrderButton;
     @FXML
-    private TableView<Product> orderProdView;
+    private TableView orderProdView;
     @FXML
     private Button baskerOrderButton;
 
@@ -475,10 +475,10 @@ public class FXMLDocumentController implements Initializable {
 
             row.hoverProperty().addListener((observable) -> {
                 final Order order = row.getItem();
-                System.out.println("beeee");
                 if (row.isHover() && order != null) {
                     this.fixOrderHover(order.getKeySet());
                 } else {
+                    orderProdView.getColumns().clear();
                     //productDescArea.setText("Hover over a product to see its description.");
                 }
             });
@@ -493,11 +493,57 @@ public class FXMLDocumentController implements Initializable {
     private void fixOrderHover(ObservableList<Product> p){
         orderProdView.getColumns().clear();
         
-        TableColumn productName = new TableColumn("Name");
         
-        productName.setCellValueFactory(new PropertyValueFactory<>("productName"));
-        orderProdView.getColumns().add(productName);
-        orderProdView.setItems(p);
+        TableColumn<Map.Entry<Product, String>, String> column1 = new TableColumn<>("Product Name");
+        column1.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Map.Entry<Product, String>, String>, ObservableValue<String>>() {
+
+            @Override
+            public ObservableValue<String> call(TableColumn.CellDataFeatures<Map.Entry<Product, String>, String> p) {
+
+                return new SimpleStringProperty(p.getValue().getKey().getProductName());
+            }
+        });
+
+        TableColumn<Map.Entry<Product, String>, String> column2 = new TableColumn<>("Price");
+        column2.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Map.Entry<Product, String>, String>, ObservableValue<String>>() {
+
+            @Override
+            public ObservableValue<String> call(TableColumn.CellDataFeatures<Map.Entry<Product, String>, String> p) {
+
+                return new SimpleStringProperty(String.valueOf(p.getValue().getKey().getPrice()));
+            }
+        });
+
+        TableColumn<Map.Entry<String, String>, String> column3 = new TableColumn<>("Quantity");
+        column3.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Map.Entry<String, String>, String>, ObservableValue<String>>() {
+
+            @Override
+            public ObservableValue<String> call(TableColumn.CellDataFeatures<Map.Entry<String, String>, String> p) {
+
+                return new SimpleStringProperty(p.getValue().getValue());
+            }
+        });
+
+        ObservableList<Map.Entry<String, String>> items = FXCollections.observableArrayList(activeUser.getBasket().getProductMap().entrySet());
+
+        column1.setMaxWidth(300);
+        column2.setMaxWidth(75);
+        column3.setMaxWidth(75);
+        orderProdView.setMaxWidth(450);
+
+        orderProdView.getColumns().setAll(column1, column2, column3);
+
+        orderProdView.setItems(items);
+        
+        
+        
+        
+        
+//        TableColumn productName = new TableColumn("Order Contents:");
+//        
+//        productName.setCellValueFactory(new PropertyValueFactory<>("productName"));
+//        orderProdView.getColumns().add(productName);
+//        orderProdView.setItems(p);
     }
     
     @FXML

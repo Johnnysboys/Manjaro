@@ -8,7 +8,7 @@
   </information>
   <resources>
     <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
-    <jar href="ElectroShop.jar" size="40066" download="eager" />
+    <jar href="ElectroShop.jar" size="43066" download="eager" />
     <jar href="lib\postgresql-9.4.1212.jre6.jar" size="676247" download="eager" />
   </resources>
   <applet-desc  width="800" height="600" main-class="com.javafx.main.NoJavaFXFallback"  name="ElectroShop" >
