@@ -16,10 +16,10 @@ import products.Product;
  */
 public class Basket {
 
-    private HashMap productMap;
+    private HashMap<Product, String> productMap;
 
     public Basket() {
-        this.productMap = new HashMap<Product, Integer>();
+        this.productMap = new HashMap<>();
     }
 
     /**
@@ -29,10 +29,14 @@ public class Basket {
      * @param product - The product to add to the basket (Key).
      * @param quantity - The quantity of said product to add (Value).
      */
-    public void addProduct(Product product, int quantity) {
+    public void addProduct(Product product, String quantity) {
         if (productMap.containsKey(product)) {
-            int currentValue = (int) productMap.get(product);
-            productMap.put(product, quantity + currentValue);
+            String amount = (String) productMap.get(product);
+            int newQuant = Integer.valueOf(amount)+Integer.valueOf(quantity);
+            String newAmount = Integer.toString(newQuant);
+            
+            productMap.put(product, newAmount);
+            
         } else {
             productMap.put(product, quantity);
         }
@@ -69,7 +73,7 @@ public class Basket {
 
         while (keyIterator.hasNext()) {
             Product product = keyIterator.next();
-            int currentValue = (int) productMap.get(product);
+            int currentValue = Integer.valueOf(productMap.get(product));
             total = total + (product.getPrice() * currentValue);
         }
 
@@ -80,7 +84,7 @@ public class Basket {
      * Returns the baskets HashMap, containing entries for every product added
      * to the basket.
      *
-     * @return - Returns a HashMap: <Product, Integer> where the integer is the
+     * @return - Returns a HashMap: <Product, String> where the integer is the
      * quantity of the matching product in the basket.
      */
     public HashMap getProductMap() {
