@@ -71,7 +71,6 @@ public class AccountsConnector extends SuperDB {
         if (exists == true) {
             System.out.println("an account with this email already exists");
         } else {
-            System.out.println("Trying to add account");
             String addString = "insert into accounts (email, name, phone, address, pw, sec) VALUES (?, ?, ?, ?, ?, ?)";
             PreparedStatement addAccount = this.getCon().prepareStatement(addString);
 

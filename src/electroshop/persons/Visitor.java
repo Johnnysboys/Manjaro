@@ -16,6 +16,10 @@ public class Visitor extends Person {
     public Visitor() {
         super(0, new Basket());
     }
+    
+    public Visitor(Basket basket) {
+        super(0, basket);
+    }
 
     public void login(String email, String pw) {
 
