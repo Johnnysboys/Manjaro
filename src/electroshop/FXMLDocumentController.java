@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,7 +29,9 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
@@ -42,6 +45,7 @@ import javafx.scene.control.cell.MapValueFactory;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.Pane;
+import javafx.scene.text.Text;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 import products.Product;
@@ -656,6 +660,37 @@ public class FXMLDocumentController implements Initializable {
         }
 
     }
+        @FXML
+    private void handlerClosePoogramButton(ActionEvent event) {
+        Alert closeAlert = new Alert(Alert.AlertType.WARNING);
+        closeAlert.setTitle("Do you want to close the program?");
+        closeAlert.setContentText("Your data will not be saved. Are you sure you want to proceed");
+        ButtonType yButton = new ButtonType("Yes");
+        ButtonType nButton = new ButtonType("No");
+        closeAlert.getButtonTypes().setAll(yButton, nButton);
+        Optional<ButtonType> result = closeAlert.showAndWait();
+        if (result.get() == yButton) {
+            System.exit(0);
+        } else if (result.get() == nButton) {
+        }
+    }
+
+    @FXML
+    private void handlerHowToButton(ActionEvent event) {
+        Text t;
+        
+        Alert closeAlert = new Alert(Alert.AlertType.NONE);
+        closeAlert.setTitle("How to use the program?");
+        closeAlert.setHeaderText("This is how you use the program!");
+        closeAlert.setContentText("1. Insert text here.\n2. Insert text here.\n3. Insert text here. ");
+        closeAlert.setResizable(true);
+        ButtonType closeButton = new ButtonType("Close");
+        closeAlert.getButtonTypes().setAll(closeButton);
+        Optional<ButtonType> result = closeAlert.showAndWait();
+        closeAlert.getDialogPane().getButtonTypes().add(ButtonType.OK);
+        
+    }
+
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
