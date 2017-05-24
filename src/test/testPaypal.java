@@ -7,8 +7,8 @@ import electroshop.connectors.PayPalConnector;
 public class testPaypal {
     public static void main(String[] args) {
         
-        CreditCard card = PayPalConnector.createCard("visa", "4417119669820331", 11,2019,012,"John", "Doe");
-        if(PayPalConnector.validateCard(card)){
+       boolean passed = PayPalConnector.validateCard("visa", "4417119669820331", 11,2019,012,"John", "Doe");
+        if(passed){
             System.out.println("Yeah boysss");
         } else {
             System.out.println("Invalid card");
