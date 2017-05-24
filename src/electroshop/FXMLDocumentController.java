@@ -10,17 +10,15 @@ import electroshop.persons.LoggedInPerson;
 import electroshop.connectors.AccountsConnector;
 import electroshop.connectors.ProductConnector;
 import electroshop.persons.Person;
+import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.beans.property.ListProperty;
-import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -28,8 +26,15 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
@@ -40,22 +45,15 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.MapValueFactory;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.Pane;
+import javafx.scene.text.Text;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.Window;
 import javafx.util.Callback;
-import javafx.util.StringConverter;
 import products.Product;
-import products.Computer;
-import products.Desktop;
-import products.Fridge;
-import products.Laptop;
-import products.Radio;
-import products.Tv;
-import products.TvRadio;
-import products.WashingMachine;
-import products.WhiteGoods;
+
 
 /**
  *
@@ -148,7 +146,10 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private Pane column6Pane;
     @FXML
-    private Button searchButton;
+    private Button searchButton;    
+    @FXML
+    private Button payButton;
+
     @FXML
     private TableView productTable;
     @FXML
@@ -221,34 +222,13 @@ public class FXMLDocumentController implements Initializable {
         basketView.getColumns().clear();
 
         TableColumn<Map.Entry<Product, String>, String> column1 = new TableColumn<>("Product Name");
-        column1.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Map.Entry<Product, String>, String>, ObservableValue<String>>() {
-
-            @Override
-            public ObservableValue<String> call(TableColumn.CellDataFeatures<Map.Entry<Product, String>, String> p) {
-
-                return new SimpleStringProperty(p.getValue().getKey().getProductName());
-            }
-        });
+        column1.setCellValueFactory((TableColumn.CellDataFeatures<Map.Entry<Product, String>, String> p) -> new SimpleStringProperty(p.getValue().getKey().getProductName()));
 
         TableColumn<Map.Entry<Product, String>, String> column2 = new TableColumn<>("Price");
-        column2.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Map.Entry<Product, String>, String>, ObservableValue<String>>() {
-
-            @Override
-            public ObservableValue<String> call(TableColumn.CellDataFeatures<Map.Entry<Product, String>, String> p) {
-
-                return new SimpleStringProperty(String.valueOf(p.getValue().getKey().getPrice()));
-            }
-        });
+        column2.setCellValueFactory((TableColumn.CellDataFeatures<Map.Entry<Product, String>, String> p) -> new SimpleStringProperty(String.valueOf(p.getValue().getKey().getPrice())));
 
         TableColumn<Map.Entry<String, String>, String> column3 = new TableColumn<>("Quantity");
-        column3.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Map.Entry<String, String>, String>, ObservableValue<String>>() {
-
-            @Override
-            public ObservableValue<String> call(TableColumn.CellDataFeatures<Map.Entry<String, String>, String> p) {
-
-                return new SimpleStringProperty(p.getValue().getValue());
-            }
-        });
+        column3.setCellValueFactory((TableColumn.CellDataFeatures<Map.Entry<String, String>, String> p) -> new SimpleStringProperty(p.getValue().getValue()));
 
         ObservableList<Map.Entry<String, String>> items = FXCollections.observableArrayList(activeUser.getBasket().getProductMap().entrySet());
 
@@ -271,9 +251,9 @@ public class FXMLDocumentController implements Initializable {
         loggedInPerson = accCon.login(email, pw, activeUser.getBasket());
 
         if (loggedInPerson == null) {
-            System.out.println("LOGIN NOT SUCCESFULL");
-            loginPane.setStyle("-fx-background-color: #800000");
+            createModal("Unknown user or password, try again.", AlertType.ERROR, true, "Login", "Login error");
         } else {
+
             System.out.println("LOGIN SUCCESFULL");
             activeUser = loggedInPerson;
             loginPane.setVisible(false);
@@ -284,6 +264,7 @@ public class FXMLDocumentController implements Initializable {
             sb.append(loggedInPerson.getTitle());
             userInfoLabel.setText(sb.toString());
             loggedInPane.setVisible(true);
+            createModal("Logged in as " + sb.toString(), AlertType.CONFIRMATION, true, "Login", "Login successful");
 
             if (activeUser.getSec() == 1) { // Is a Customer
                 tabPane.getTabs().add(orderHistTab);
@@ -483,7 +464,8 @@ public class FXMLDocumentController implements Initializable {
 
         prodSearch = FXCollections.observableArrayList(prodCon.findProducts(category, catColumnsList, name, price, col1, col2, col3, col4, col5, col6));
         if (prodSearch == null) {
-            System.out.println("No products found"); // WHAT DO WE DO 
+            String msg = "No products found";
+            createModal(msg, AlertType.WARNING, true, "Warning", "Warning");
             return;
         }
 
@@ -696,18 +678,22 @@ public class FXMLDocumentController implements Initializable {
 
     @FXML
     private void showOrderHistory() {
-        // ObservableList<Order> orderList = FXCollections.observableArrayList();
         orderView.getColumns().clear();
 
         TableColumn orderNumber = new TableColumn("Order ID");
         TableColumn orderPrice = new TableColumn("Price Total");
         TableColumn orderDate = new TableColumn("Date");
+        TableColumn orderPaymentStatus = new TableColumn("Paid");
+
 
         orderNumber.setCellValueFactory(new PropertyValueFactory<>("orderID"));
         orderPrice.setCellValueFactory(new PropertyValueFactory("priceTotal"));
-        orderDate.setCellValueFactory(new PropertyValueFactory("orderDate"));
+        orderDate.setCellValueFactory(new PropertyValueFactory("orderDate"));   
+        orderPaymentStatus.setCellValueFactory(new PropertyValueFactory("isPaid"));
 
-        orderView.getColumns().addAll(orderNumber, orderPrice, orderDate);
+        
+
+        orderView.getColumns().addAll(orderNumber, orderPrice, orderDate, orderPaymentStatus);
 
         orderView.setRowFactory(tableView -> {
             final TableRow<Order> row = new TableRow<>();
@@ -776,7 +762,8 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private void makeOrderHandler(ActionEvent event) {
         Order order = new Order(activeUser.getBasket());
-
+        System.out.println(order);
+        payHandler(event, order);
         orderList.add(order);
     }
 
@@ -876,6 +863,37 @@ public class FXMLDocumentController implements Initializable {
         }
 
     }
+        @FXML
+    private void handlerClosePoogramButton(ActionEvent event) {
+        Alert closeAlert = new Alert(Alert.AlertType.WARNING);
+        closeAlert.setTitle("Do you want to close the program?");
+        closeAlert.setContentText("Your data will not be saved. Are you sure you want to proceed");
+        ButtonType yButton = new ButtonType("Yes");
+        ButtonType nButton = new ButtonType("No");
+        closeAlert.getButtonTypes().setAll(yButton, nButton);
+        Optional<ButtonType> result = closeAlert.showAndWait();
+        if (result.get() == yButton) {
+            System.exit(0);
+        } else if (result.get() == nButton) {
+        }
+    }
+
+    @FXML
+    private void handlerHowToButton(ActionEvent event) {
+        Text t;
+        
+        Alert closeAlert = new Alert(Alert.AlertType.NONE);
+        closeAlert.setTitle("How to use the program?");
+        closeAlert.setHeaderText("This is how you use the program!");
+        closeAlert.setContentText("1. Insert text here.\n2. Insert text here.\n3. Insert text here. ");
+        closeAlert.setResizable(true);
+        ButtonType closeButton = new ButtonType("Close");
+        closeAlert.getButtonTypes().setAll(closeButton);
+        Optional<ButtonType> result = closeAlert.showAndWait();
+        closeAlert.getDialogPane().getButtonTypes().add(ButtonType.OK);
+        
+    }
+
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -916,5 +934,72 @@ public class FXMLDocumentController implements Initializable {
         });
 
     }
+    
+    @FXML
+    private void payHandler(ActionEvent event, Order order) {
+        showDialog(((Node)event.getTarget()).getScene().getWindow(), order);
+    }
+    
+     private void showDialog(Window parent, Order order) {
+        boolean answer = false;
+        Parent root;
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("PaypalDialog.fxml"));
+            root = loader.load();
+            PaypalDialogController paypalDialogController = loader.getController();
+            Scene scene = new Scene(root);
+            Stage dialog = new Stage();
+                        
+            // Debug value
+            
+            paypalDialogController.setVariables(dialog, order);
+            
+            dialog.initOwner(parent);
+            dialog.initModality(Modality.WINDOW_MODAL); 
+            dialog.setScene(scene);
+            dialog.showAndWait();
+            
+            order = paypalDialogController.getOrder();
+            
+            if(!order.isIsPaid()){
+                String msg = "You didnt pay for the order";
+                createModal(msg, Alert.AlertType.WARNING, true);
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(FXMLDocumentController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+        
+        private void createModal(String message, Alert.AlertType type, boolean modal){
+                Alert alert = new Alert(type);
+                alert.setContentText(message);
+                if(modal){
+                    alert.initModality(Modality.APPLICATION_MODAL); 
+                }
+                alert.showAndWait();
+        }
+        private void createModal(String message, Alert.AlertType type, boolean modal, String title){
+                Alert alert = new Alert(type);
+                alert.setTitle(title);
+                
+                alert.setContentText(message);
+                if(modal){
+                    alert.initModality(Modality.APPLICATION_MODAL); 
+                }
+                alert.showAndWait();
+        }
+                private void createModal(String message, Alert.AlertType type, boolean modal, String title, String header){
+                Alert alert = new Alert(type);
+                alert.setTitle(title);
+                alert.setHeaderText(header);
+                alert.setContentText(message);
+                if(modal){
+                    alert.initModality(Modality.APPLICATION_MODAL); 
+                }
+                alert.showAndWait();
+        }
 
 }
+
+
+   
