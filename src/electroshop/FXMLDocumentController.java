@@ -14,15 +14,11 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.beans.property.ListProperty;
-import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -46,26 +42,15 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.MapValueFactory;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Callback;
-import javafx.util.StringConverter;
 import products.Product;
-import products.Computer;
-import products.Desktop;
-import products.Fridge;
-import products.Laptop;
-import products.Radio;
-import products.Tv;
-import products.TvRadio;
-import products.WashingMachine;
-import products.WhiteGoods;
+
 
 /**
  *
@@ -202,34 +187,13 @@ public class FXMLDocumentController implements Initializable {
         basketView.getColumns().clear();
 
         TableColumn<Map.Entry<Product, String>, String> column1 = new TableColumn<>("Product Name");
-        column1.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Map.Entry<Product, String>, String>, ObservableValue<String>>() {
-
-            @Override
-            public ObservableValue<String> call(TableColumn.CellDataFeatures<Map.Entry<Product, String>, String> p) {
-
-                return new SimpleStringProperty(p.getValue().getKey().getProductName());
-            }
-        });
+        column1.setCellValueFactory((TableColumn.CellDataFeatures<Map.Entry<Product, String>, String> p) -> new SimpleStringProperty(p.getValue().getKey().getProductName()));
 
         TableColumn<Map.Entry<Product, String>, String> column2 = new TableColumn<>("Price");
-        column2.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Map.Entry<Product, String>, String>, ObservableValue<String>>() {
-
-            @Override
-            public ObservableValue<String> call(TableColumn.CellDataFeatures<Map.Entry<Product, String>, String> p) {
-
-                return new SimpleStringProperty(String.valueOf(p.getValue().getKey().getPrice()));
-            }
-        });
+        column2.setCellValueFactory((TableColumn.CellDataFeatures<Map.Entry<Product, String>, String> p) -> new SimpleStringProperty(String.valueOf(p.getValue().getKey().getPrice())));
 
         TableColumn<Map.Entry<String, String>, String> column3 = new TableColumn<>("Quantity");
-        column3.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Map.Entry<String, String>, String>, ObservableValue<String>>() {
-
-            @Override
-            public ObservableValue<String> call(TableColumn.CellDataFeatures<Map.Entry<String, String>, String> p) {
-
-                return new SimpleStringProperty(p.getValue().getValue());
-            }
-        });
+        column3.setCellValueFactory((TableColumn.CellDataFeatures<Map.Entry<String, String>, String> p) -> new SimpleStringProperty(p.getValue().getValue()));
 
         ObservableList<Map.Entry<String, String>> items = FXCollections.observableArrayList(activeUser.getBasket().getProductMap().entrySet());
 
@@ -252,9 +216,9 @@ public class FXMLDocumentController implements Initializable {
         loggedInPerson = accCon.login(email, pw, activeUser.getBasket());
 
         if (loggedInPerson == null) {
-            System.out.println("LOGIN NOT SUCCESFULL");
-            loginPane.setStyle("-fx-background-color: #800000");
+            createModal("Unknown user or password, try again.", AlertType.ERROR, true, "Login", "Login error");
         } else {
+
             System.out.println("LOGIN SUCCESFULL");
             activeUser = loggedInPerson;
             loginPane.setVisible(false);
@@ -265,6 +229,7 @@ public class FXMLDocumentController implements Initializable {
             sb.append(loggedInPerson.getTitle());
             userInfoLabel.setText(sb.toString());
             loggedInPane.setVisible(true);
+            createModal("Logged in as " + sb.toString(), AlertType.CONFIRMATION, true, "Login", "Login successful");
 
         }
 
@@ -285,7 +250,7 @@ public class FXMLDocumentController implements Initializable {
         prodSearch = FXCollections.observableArrayList(prodCon.findProducts(category, catColumnsList, name, price, col1, col2, col3, col4, col5, col6));
         if (prodSearch == null) {
             String msg = "No products found";
-            createModal(msg, AlertType.WARNING, true);
+            createModal(msg, AlertType.WARNING, true, "Warning", "Warning");
 //            System.out.println("No products found"); // WHAT DO WE DO 
             return;
         }
@@ -755,7 +720,27 @@ public class FXMLDocumentController implements Initializable {
                 Alert alert = new Alert(type);
                 alert.setContentText(message);
                 if(modal){
-                    alert.initModality(Modality.WINDOW_MODAL); 
+                    alert.initModality(Modality.APPLICATION_MODAL); 
+                }
+                alert.showAndWait();
+        }
+        private void createModal(String message, Alert.AlertType type, boolean modal, String title){
+                Alert alert = new Alert(type);
+                alert.setTitle(title);
+                
+                alert.setContentText(message);
+                if(modal){
+                    alert.initModality(Modality.APPLICATION_MODAL); 
+                }
+                alert.showAndWait();
+        }
+                private void createModal(String message, Alert.AlertType type, boolean modal, String title, String header){
+                Alert alert = new Alert(type);
+                alert.setTitle(title);
+                alert.setHeaderText(header);
+                alert.setContentText(message);
+                if(modal){
+                    alert.initModality(Modality.APPLICATION_MODAL); 
                 }
                 alert.showAndWait();
         }
