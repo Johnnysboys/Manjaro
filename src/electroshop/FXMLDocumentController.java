@@ -27,6 +27,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -251,7 +252,6 @@ public class FXMLDocumentController implements Initializable {
         if (prodSearch == null) {
             String msg = "No products found";
             createModal(msg, AlertType.WARNING, true, "Warning", "Warning");
-//            System.out.println("No products found"); // WHAT DO WE DO 
             return;
         }
 
@@ -441,12 +441,17 @@ public class FXMLDocumentController implements Initializable {
         TableColumn orderNumber = new TableColumn("Order ID");
         TableColumn orderPrice = new TableColumn("Price Total");
         TableColumn orderDate = new TableColumn("Date");
+        TableColumn orderPaymentStatus = new TableColumn("Paid");
+
 
         orderNumber.setCellValueFactory(new PropertyValueFactory<>("orderID"));
         orderPrice.setCellValueFactory(new PropertyValueFactory("priceTotal"));
-        orderDate.setCellValueFactory(new PropertyValueFactory("orderDate"));
+        orderDate.setCellValueFactory(new PropertyValueFactory("orderDate"));   
+        orderPaymentStatus.setCellValueFactory(new PropertyValueFactory("isPaid"));
 
-        orderView.getColumns().addAll(orderNumber, orderPrice, orderDate);
+        
+
+        orderView.getColumns().addAll(orderNumber, orderPrice, orderDate, orderPaymentStatus);
 
         orderView.setRowFactory(tableView -> {
             final TableRow<Order> row = new TableRow<>();
@@ -527,7 +532,8 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private void makeOrderHandler(ActionEvent event){
         Order order = new Order(activeUser.getBasket());
-        
+        System.out.println(order);
+        payHandler(event, order);
         orderList.add(order);
     }
 
@@ -681,11 +687,11 @@ public class FXMLDocumentController implements Initializable {
     }
     
     @FXML
-    private void payHandler(ActionEvent event) {
-        showDialog(payButton.getScene().getWindow());
+    private void payHandler(ActionEvent event, Order order) {
+        showDialog(((Node)event.getTarget()).getScene().getWindow(), order);
     }
     
-     private void showDialog(Window parent) {
+     private void showDialog(Window parent, Order order) {
         boolean answer = false;
         Parent root;
         try {
@@ -696,7 +702,6 @@ public class FXMLDocumentController implements Initializable {
             Stage dialog = new Stage();
                         
             // Debug value
-            Order order = new Order(1,1500, false);
             
             paypalDialogController.setVariables(dialog, order);
             
