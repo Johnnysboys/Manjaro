@@ -14,10 +14,15 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -29,8 +34,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
@@ -40,13 +45,26 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.MapValueFactory;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.Pane;
+import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Callback;
+import javafx.util.StringConverter;
 import products.Product;
+import products.Computer;
+import products.Desktop;
+import products.Fridge;
+import products.Laptop;
+import products.Radio;
+import products.Tv;
+import products.TvRadio;
+import products.WashingMachine;
+import products.WhiteGoods;
 
 /**
  *
@@ -139,7 +157,10 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private Pane column6Pane;
     @FXML
-    private Button searchButton;
+    private Button searchButton;    
+    @FXML
+    private Button payButton;
+
     @FXML
     private TableView productTable;
     @FXML
@@ -164,8 +185,6 @@ public class FXMLDocumentController implements Initializable {
     private TableView orderProdView;
     @FXML
     private Button baskerOrderButton;
-    @FXML
-    private Button payButton;
 
     @FXML
     private void handleBasketUpdate(ActionEvent event) {
@@ -456,6 +475,9 @@ public class FXMLDocumentController implements Initializable {
         TableColumn orderPrice = new TableColumn("Price Total");
         TableColumn orderDate = new TableColumn("Date");
 
+//        orderList.add(new Order(1, 2.00, true));
+//        orderList.add(new Order(1, 1500.00, true));
+//        orderList.add(new Order(1, 20.00, true));
         orderNumber.setCellValueFactory(new PropertyValueFactory<>("orderID"));
         orderPrice.setCellValueFactory(new PropertyValueFactory("priceTotal"));
         orderDate.setCellValueFactory(new PropertyValueFactory("orderDate"));
@@ -541,6 +563,7 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private void makeOrderHandler(ActionEvent event){
         Order order = new Order(activeUser.getBasket());
+        
         orderList.add(order);
     }
 
@@ -647,6 +670,37 @@ public class FXMLDocumentController implements Initializable {
         }
 
     }
+        @FXML
+    private void handlerClosePoogramButton(ActionEvent event) {
+        Alert closeAlert = new Alert(Alert.AlertType.WARNING);
+        closeAlert.setTitle("Do you want to close the program?");
+        closeAlert.setContentText("Your data will not be saved. Are you sure you want to proceed");
+        ButtonType yButton = new ButtonType("Yes");
+        ButtonType nButton = new ButtonType("No");
+        closeAlert.getButtonTypes().setAll(yButton, nButton);
+        Optional<ButtonType> result = closeAlert.showAndWait();
+        if (result.get() == yButton) {
+            System.exit(0);
+        } else if (result.get() == nButton) {
+        }
+    }
+
+    @FXML
+    private void handlerHowToButton(ActionEvent event) {
+        Text t;
+        
+        Alert closeAlert = new Alert(Alert.AlertType.NONE);
+        closeAlert.setTitle("How to use the program?");
+        closeAlert.setHeaderText("This is how you use the program!");
+        closeAlert.setContentText("1. Insert text here.\n2. Insert text here.\n3. Insert text here. ");
+        closeAlert.setResizable(true);
+        ButtonType closeButton = new ButtonType("Close");
+        closeAlert.getButtonTypes().setAll(closeButton);
+        Optional<ButtonType> result = closeAlert.showAndWait();
+        closeAlert.getDialogPane().getButtonTypes().add(ButtonType.OK);
+        
+    }
+
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -661,7 +715,7 @@ public class FXMLDocumentController implements Initializable {
         }
 
     }
-
+    
     @FXML
     private void payHandler(ActionEvent event) {
         showDialog(payButton.getScene().getWindow());
@@ -690,15 +744,15 @@ public class FXMLDocumentController implements Initializable {
             order = paypalDialogController.getOrder();
             
             if(!order.isIsPaid()){
-                String msg = "You did'nt pay for the order";
-                createModal(msg, AlertType.WARNING, true);
+                String msg = "You didn't pay for the order";
+                createModal(msg, Alert.AlertType.WARNING, true);
             }
         } catch (IOException ex) {
             Logger.getLogger(FXMLDocumentController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
         
-        private void createModal(String message, AlertType type, boolean modal){
+        private void createModal(String message, Alert.AlertType type, boolean modal){
                 Alert alert = new Alert(type);
                 alert.setContentText(message);
                 if(modal){
@@ -708,3 +762,6 @@ public class FXMLDocumentController implements Initializable {
         }
 
 }
+
+
+   
