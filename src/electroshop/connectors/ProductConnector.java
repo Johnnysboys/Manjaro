@@ -66,6 +66,79 @@ public class ProductConnector extends SuperDB {
         }
         return list;
     }
+    
+    public void changeProductDesc(int id, String desc) throws SQLException{
+        String query = "UPDATE products set description = ? WHERE id = ?";
+        PreparedStatement descChange = this.getCon().prepareStatement(query);
+        descChange.setString(1, desc);
+        descChange.setInt(2, id);
+        
+        descChange.execute();
+        
+        
+    }
+    
+
+    public ArrayList findProductsByName(String category, String name) throws SQLException {
+        ArrayList pList;
+        if (category.equals("desktops")) {
+            pList = new ArrayList<Desktop>();
+        } else if (category.equals("laptops")) {
+            pList = new ArrayList<Laptop>();
+        } else if (category.equals("washingmachine")) {
+            pList = new ArrayList<WashingMachine>();
+        } else if (category.equals("fridges")) {
+            pList = new ArrayList<Fridge>();
+        } else if (category.equals("tv")) {
+            pList = new ArrayList<Tv>();
+        } else if (category.equals("radio")) {
+            pList = new ArrayList<Radio>();
+        } else {
+            pList = new ArrayList<Product>();
+        }
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("SELECT * FROM ").append(category);
+        sb.append(" WHERE ");
+        sb.append("name ILIKE '%").append(name).append("%'");
+        
+        
+        PreparedStatement ps = this.getCon().prepareStatement(sb.toString());
+        ResultSet rs = ps.executeQuery();
+        int q = 0;
+        while (rs.next() && q < 10) {
+            Product prod = null;
+            if (category.equals("desktops")) {
+                prod = new Desktop(rs.getString("formfactor"), rs.getBoolean("integratedwifi"), rs.getDouble("processor"), rs.getInt("ram"), rs.getInt("harddrive"), rs.getInt("id"), rs.getString("name"), rs.getDouble("price"), rs.getString("description"));
+                Desktop desk = (Desktop) prod;
+                pList.add(desk);
+            } else if (category.equals("laptops")) {
+                prod = new Laptop(rs.getDouble("screensize"), rs.getDouble("weight"), rs.getInt("battery"), rs.getDouble("processor"), rs.getInt("ram"), rs.getInt("harddrive"), rs.getInt("id"), rs.getString("name"), rs.getDouble("price"), rs.getString("description"));
+                Laptop lap = (Laptop) prod;
+                pList.add(lap);
+            } else if (category.equals("washingmachine")) {
+                prod = new WashingMachine(rs.getInt("rpm"), rs.getDouble("capacity"), rs.getInt("noiselevel"), rs.getInt("energyusage"), rs.getInt("id"), rs.getString("name"), rs.getDouble("price"), rs.getString("description"));
+                WashingMachine wash = (WashingMachine) prod;
+                pList.add(wash);
+            } else if (category.equals("fridges")) {
+                prod = new Fridge(rs.getDouble("volume"), rs.getInt("shelf"), rs.getInt("noiselevel"), rs.getInt("energyusage"), rs.getInt("id"), rs.getString("name"), rs.getDouble("price"), rs.getString("description"));
+                Fridge fridge = (Fridge) prod;
+                pList.add(fridge);
+            } else if (category.equals("tv")) {
+                prod = new Tv(rs.getDouble("screensize"), rs.getString("resolution"), rs.getString("paneltype"), rs.getInt("soundlevel"), rs.getString("color"), rs.getInt("id"), rs.getString("name"), rs.getDouble("price"), rs.getString("description"));
+                Tv tv = (Tv) prod;
+                pList.add(tv);
+            } else if (category.equals("radio")) {
+                prod = new Radio(rs.getInt("battery"), rs.getInt("effect"), rs.getInt("soundlevel"), rs.getString("color"), rs.getInt("id"), rs.getString("name"), rs.getDouble("price"), rs.getString("description"));
+                Radio rad = (Radio) prod;
+                pList.add(rad);
+            }
+        }
+
+        return pList;
+
+    }
 
     public ArrayList findProducts(String category, ArrayList<String> columns, String name, String price, String col1, String col2, String col3, String col4, String col5, String col6) throws SQLException {
         ArrayList pList;
@@ -169,11 +242,6 @@ public class ProductConnector extends SuperDB {
                 Radio rad = (Radio) prod;
                 pList.add(rad);
             }
-
-//            pList.add(desk);
-//            prod.toString();
-//            pList.add(prod);
-
         }
 
         return pList;

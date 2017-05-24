@@ -19,7 +19,28 @@ public class PayPalConnector {
         try {
             APIContext context = new APIContext(clientId, clientSecret, "sandbox");
             card.create(context);
-            System.out.println(card);
+            return true;
+        } catch (PayPalRESTException e) {
+            System.err.println(e.getDetails());
+            return false;
+        }
+    }    
+    public static boolean validateCard(String type, String cardNumber, int expMonth, int expYear, int CCV, String firstName, String lastName){
+        CreditCard card = createCard(type, cardNumber, expMonth, expYear, CCV, firstName, lastName);
+        try {
+            APIContext context = new APIContext(clientId, clientSecret, "sandbox");
+            card.create(context);
+            return true;
+        } catch (PayPalRESTException e) {
+            System.err.println(e.getDetails());
+            return false;
+        }
+    }
+    public static boolean validateCard(String type, String cardNumber, int expMonth, int expYear, String CCV, String firstName, String lastName){
+        CreditCard card = createCard(type, cardNumber, expMonth, expYear, CCV, firstName, lastName);
+        try {
+            APIContext context = new APIContext(clientId, clientSecret, "sandbox");
+            card.create(context);
             return true;
         } catch (PayPalRESTException e) {
             System.err.println(e.getDetails());
@@ -27,7 +48,17 @@ public class PayPalConnector {
         }
     }
 
-    public static CreditCard createCard(String type, String cardNumber, int expMonth, int expYear, int CCV, String firstName, String lastName){
+    private static CreditCard createCard(String type, String cardNumber, int expMonth, int expYear, int CCV, String firstName, String lastName){
+        return new CreditCard()
+                .setType(type)
+                .setNumber(cardNumber)
+                .setFirstName(firstName)
+                .setLastName(lastName)
+                .setExpireMonth(expMonth)
+                .setExpireYear(expYear)
+                .setCvv2(CCV);
+    }
+    private static CreditCard createCard(String type, String cardNumber, int expMonth, int expYear, String CCV, String firstName, String lastName){
         return new CreditCard()
                 .setType(type)
                 .setNumber(cardNumber)

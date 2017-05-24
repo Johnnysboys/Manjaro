@@ -10,11 +10,10 @@ import electroshop.persons.LoggedInPerson;
 import electroshop.connectors.AccountsConnector;
 import electroshop.connectors.ProductConnector;
 import electroshop.persons.Person;
+import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -23,41 +22,40 @@ import java.util.logging.Logger;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.MapValueFactory;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.Window;
 import javafx.util.Callback;
-import javafx.util.StringConverter;
 import products.Product;
-import products.Computer;
-import products.Desktop;
-import products.Fridge;
-import products.Laptop;
-import products.Radio;
-import products.Tv;
-import products.TvRadio;
-import products.WashingMachine;
-import products.WhiteGoods;
+
 
 /**
  *
@@ -72,8 +70,8 @@ public class FXMLDocumentController implements Initializable {
     private ArrayList<String> catColumnsList;
     private ObservableList<Product> prodSearch;
     ObservableList<Order> orderList = FXCollections.observableArrayList();
-    
-    
+    ObservableList<Order> empOrderList = FXCollections.observableArrayList();
+    private ObservableList<Product> prodManSearch;
 
     @FXML
     private Pane loginPane;
@@ -150,7 +148,10 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private Pane column6Pane;
     @FXML
-    private Button searchButton;
+    private Button searchButton;    
+    @FXML
+    private Button payButton;
+
     @FXML
     private TableView productTable;
     @FXML
@@ -175,6 +176,38 @@ public class FXMLDocumentController implements Initializable {
     private TableView orderProdView;
     @FXML
     private Button baskerOrderButton;
+    @FXML
+    private Tab signUpTab;
+    @FXML
+    private TabPane tabPane;
+    @FXML
+    private Tab browseTab;
+    @FXML
+    private Tab basketTab;
+    @FXML
+    private Tab employeeOrderTab;
+    @FXML
+    private TableView<Order> empOrderView;
+    @FXML
+    private TableView empOrderProdView;
+    @FXML
+    private Button empFindButton;
+    @FXML
+    private TextField empOrderSearchField;
+    @FXML
+    private ComboBox<String> categoryDropMan;
+    @FXML
+    private Tab prodManTab;
+    @FXML
+    private TableView<Product> prodManView;
+    @FXML
+    private TextField prodManSearchField;
+    @FXML
+    private Button prodManSearchButton;
+    @FXML
+    private TextArea prodManArea;
+    @FXML
+    private Button prodManCommitButton;
 
     @FXML
     private void handleBasketUpdate(ActionEvent event) {
@@ -191,34 +224,13 @@ public class FXMLDocumentController implements Initializable {
         basketView.getColumns().clear();
 
         TableColumn<Map.Entry<Product, String>, String> column1 = new TableColumn<>("Product Name");
-        column1.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Map.Entry<Product, String>, String>, ObservableValue<String>>() {
-
-            @Override
-            public ObservableValue<String> call(TableColumn.CellDataFeatures<Map.Entry<Product, String>, String> p) {
-
-                return new SimpleStringProperty(p.getValue().getKey().getProductName());
-            }
-        });
+        column1.setCellValueFactory((TableColumn.CellDataFeatures<Map.Entry<Product, String>, String> p) -> new SimpleStringProperty(p.getValue().getKey().getProductName()));
 
         TableColumn<Map.Entry<Product, String>, String> column2 = new TableColumn<>("Price");
-        column2.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Map.Entry<Product, String>, String>, ObservableValue<String>>() {
-
-            @Override
-            public ObservableValue<String> call(TableColumn.CellDataFeatures<Map.Entry<Product, String>, String> p) {
-
-                return new SimpleStringProperty(String.valueOf(p.getValue().getKey().getPrice()));
-            }
-        });
+        column2.setCellValueFactory((TableColumn.CellDataFeatures<Map.Entry<Product, String>, String> p) -> new SimpleStringProperty(String.valueOf(p.getValue().getKey().getPrice())));
 
         TableColumn<Map.Entry<String, String>, String> column3 = new TableColumn<>("Quantity");
-        column3.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Map.Entry<String, String>, String>, ObservableValue<String>>() {
-
-            @Override
-            public ObservableValue<String> call(TableColumn.CellDataFeatures<Map.Entry<String, String>, String> p) {
-
-                return new SimpleStringProperty(p.getValue().getValue());
-            }
-        });
+        column3.setCellValueFactory((TableColumn.CellDataFeatures<Map.Entry<String, String>, String> p) -> new SimpleStringProperty(p.getValue().getValue()));
 
         ObservableList<Map.Entry<String, String>> items = FXCollections.observableArrayList(activeUser.getBasket().getProductMap().entrySet());
 
@@ -241,9 +253,9 @@ public class FXMLDocumentController implements Initializable {
         loggedInPerson = accCon.login(email, pw, activeUser.getBasket());
 
         if (loggedInPerson == null) {
-            System.out.println("LOGIN NOT SUCCESFULL");
-            loginPane.setStyle("-fx-background-color: #800000");
+            createModal("Unknown user or password, try again.", AlertType.ERROR, true, "Login", "Login error");
         } else {
+
             System.out.println("LOGIN SUCCESFULL");
             activeUser = loggedInPerson;
             loginPane.setVisible(false);
@@ -254,9 +266,179 @@ public class FXMLDocumentController implements Initializable {
             sb.append(loggedInPerson.getTitle());
             userInfoLabel.setText(sb.toString());
             loggedInPane.setVisible(true);
+            createModal("Logged in as " + sb.toString(), AlertType.CONFIRMATION, true, "Login", "Login successful");
+
+            if (activeUser.getSec() == 1) { // Is a Customer
+                tabPane.getTabs().add(orderHistTab);
+                tabPane.getTabs().remove(signUpTab);
+            } else if (activeUser.getSec() == 2) { // Is an Employee
+
+            } else if (activeUser.getSec() == 3) { // Is an Administrator
+                tabPane.getTabs().remove(signUpTab);
+                tabPane.getTabs().add(prodManTab);
+                        
+
+            }
 
         }
 
+    }
+
+    @FXML
+    private void handleLogout(ActionEvent event) {
+        loggedInPane.setVisible(false);
+        loginPane.setVisible(true);
+        signUpTab.setDisable(false);
+
+        activeUser = new Visitor(activeUser.getBasket());
+        tabPane.getTabs().remove(orderHistTab);
+        tabPane.getTabs().add(signUpTab);
+    }
+
+    @FXML
+    private void handleManCommit(ActionEvent event) throws SQLException {
+        int id = prodManView.getSelectionModel().getSelectedItem().getProductId();
+        System.out.println(id);
+        String newDesc = prodManArea.getText();
+        //System.out.println(prodManView.getSelectionModel().getSelectedItem().getProductId());
+
+        System.out.println(newDesc);
+        prodCon.changeProductDesc(id, newDesc);
+        System.out.println("");
+        prodManArea.clear();
+        prodManCommitButton.setDisable(true);
+        this.prodManSearchHandle(event);
+    }
+
+    @FXML
+    private void prodManSearchHandle(ActionEvent event) throws SQLException {
+        String searchQuery = prodManSearchField.getText();
+        String category = (String) categoryDropMan.getValue();
+        System.out.println("ree");
+        ArrayList<String> columns = prodCon.getColumns(category);
+
+        prodManView.getColumns().clear();
+
+        prodManSearch = FXCollections.observableArrayList(prodCon.findProductsByName(category, searchQuery));
+
+        switch (category) {
+            case "desktops": {
+                TableColumn c1 = new TableColumn(columns.get(1));
+                TableColumn c2 = new TableColumn(columns.get(2));
+                TableColumn c4 = new TableColumn(columns.get(4));
+                TableColumn c5 = new TableColumn(columns.get(5));
+                TableColumn c6 = new TableColumn(columns.get(6));
+                TableColumn c7 = new TableColumn(columns.get(7));
+                TableColumn c8 = new TableColumn(columns.get(8));
+
+                prodManView.getColumns().addAll(c1, c2, c4, c5, c6, c7, c8);
+
+                c1.setCellValueFactory(new PropertyValueFactory<Product, String>("productName"));
+                c2.setCellValueFactory(new PropertyValueFactory<Product, String>("price"));
+                c4.setCellValueFactory(new PropertyValueFactory<Product, String>("processor"));
+                c5.setCellValueFactory(new PropertyValueFactory<Product, String>("ram"));
+                c6.setCellValueFactory(new PropertyValueFactory<Product, String>("harddrivesSize"));
+                c7.setCellValueFactory(new PropertyValueFactory<Product, String>("formfactor"));
+                c8.setCellValueFactory(new PropertyValueFactory<Product, String>("integratedWifi"));
+                break;
+            }
+            case "washingmachine": {
+                TableColumn c1 = new TableColumn(columns.get(1));
+                TableColumn c2 = new TableColumn(columns.get(2));
+                TableColumn c4 = new TableColumn(columns.get(4));
+                TableColumn c5 = new TableColumn(columns.get(5));
+                TableColumn c6 = new TableColumn(columns.get(6));
+                TableColumn c7 = new TableColumn(columns.get(7));
+
+                prodManView.getColumns().addAll(c1, c2, c4, c5, c6, c7);
+                c1.setCellValueFactory(new PropertyValueFactory<Product, String>("productName"));
+                c2.setCellValueFactory(new PropertyValueFactory<Product, String>("price"));
+                c4.setCellValueFactory(new PropertyValueFactory<Product, String>("noiseLevel"));
+                c5.setCellValueFactory(new PropertyValueFactory<Product, String>("energyUsage"));
+                c6.setCellValueFactory(new PropertyValueFactory<Product, String>("rpm"));
+                c7.setCellValueFactory(new PropertyValueFactory<Product, String>("capacity"));
+                break;
+            }
+            case "fridges": {
+                TableColumn c1 = new TableColumn(columns.get(1));
+                TableColumn c2 = new TableColumn(columns.get(2));
+                TableColumn c4 = new TableColumn(columns.get(4));
+                TableColumn c5 = new TableColumn(columns.get(5));
+                TableColumn c6 = new TableColumn(columns.get(6));
+                TableColumn c7 = new TableColumn(columns.get(7));
+
+                prodManView.getColumns().addAll(c1, c2, c4, c5, c6, c7);
+                c1.setCellValueFactory(new PropertyValueFactory<Product, String>("productName"));
+                c2.setCellValueFactory(new PropertyValueFactory<Product, String>("price"));
+                c4.setCellValueFactory(new PropertyValueFactory<Product, String>("noiseLevel"));
+                c5.setCellValueFactory(new PropertyValueFactory<Product, String>("energyUsage"));
+                c6.setCellValueFactory(new PropertyValueFactory<Product, String>("volume"));
+                c7.setCellValueFactory(new PropertyValueFactory<Product, String>("shelfs"));
+                break;
+            }
+            case "tv": {
+                TableColumn c1 = new TableColumn(columns.get(1));
+                TableColumn c2 = new TableColumn(columns.get(2));
+                TableColumn c4 = new TableColumn(columns.get(4));
+                TableColumn c5 = new TableColumn(columns.get(5));
+                TableColumn c6 = new TableColumn(columns.get(6));
+                TableColumn c7 = new TableColumn(columns.get(7));
+                TableColumn c8 = new TableColumn(columns.get(8));
+
+                prodManView.getColumns().addAll(c1, c2, c4, c5, c6, c7, c8);
+                c1.setCellValueFactory(new PropertyValueFactory<Product, String>("productName"));
+                c2.setCellValueFactory(new PropertyValueFactory<Product, String>("price"));
+                c4.setCellValueFactory(new PropertyValueFactory<Product, String>("soundLevel"));
+                c5.setCellValueFactory(new PropertyValueFactory<Product, String>("color"));
+                c6.setCellValueFactory(new PropertyValueFactory<Product, String>("screenSize"));
+                c7.setCellValueFactory(new PropertyValueFactory<Product, String>("resolution"));
+                c8.setCellValueFactory(new PropertyValueFactory<Product, String>("panelType"));
+                break;
+            }
+            case "radio": {
+                TableColumn c1 = new TableColumn(columns.get(1));
+                TableColumn c2 = new TableColumn(columns.get(2));
+                TableColumn c4 = new TableColumn(columns.get(4));
+                TableColumn c5 = new TableColumn(columns.get(5));
+                TableColumn c6 = new TableColumn(columns.get(6));
+                TableColumn c7 = new TableColumn(columns.get(7));
+
+                prodManView.getColumns().addAll(c1, c2, c4, c5, c6, c7);
+                c1.setCellValueFactory(new PropertyValueFactory<Product, String>("productName"));
+                c2.setCellValueFactory(new PropertyValueFactory<Product, String>("price"));
+                c4.setCellValueFactory(new PropertyValueFactory<Product, String>("soundLevel"));
+                c5.setCellValueFactory(new PropertyValueFactory<Product, String>("color"));
+                c6.setCellValueFactory(new PropertyValueFactory<Product, String>("batteryLife"));
+                c7.setCellValueFactory(new PropertyValueFactory<Product, String>("effect"));
+                break;
+            }
+            case "laptops": {
+                TableColumn c1 = new TableColumn(columns.get(1));
+                TableColumn c2 = new TableColumn(columns.get(2));
+                TableColumn c4 = new TableColumn(columns.get(4));
+                TableColumn c5 = new TableColumn(columns.get(5));
+                TableColumn c6 = new TableColumn(columns.get(6));
+                TableColumn c7 = new TableColumn(columns.get(7));
+                TableColumn c8 = new TableColumn(columns.get(8));
+                TableColumn c9 = new TableColumn(columns.get(9));
+
+                prodManView.getColumns().addAll(c1, c2, c4, c5, c6, c7, c8, c9);
+                c1.setCellValueFactory(new PropertyValueFactory<Product, String>("productName"));
+                c2.setCellValueFactory(new PropertyValueFactory<Product, String>("price"));
+                c4.setCellValueFactory(new PropertyValueFactory<Product, String>("processor"));
+                c5.setCellValueFactory(new PropertyValueFactory<Product, String>("ram"));
+                c6.setCellValueFactory(new PropertyValueFactory<Product, String>("harddrivesSize"));
+                c7.setCellValueFactory(new PropertyValueFactory<Product, String>("screenSize"));
+                c8.setCellValueFactory(new PropertyValueFactory<Product, String>("weight"));
+                c9.setCellValueFactory(new PropertyValueFactory<Product, String>("batteryLife"));
+                break;
+            }
+            default:
+                System.out.println("Category not recognized.");
+                break;
+        }
+
+        prodManView.setItems(prodManSearch);
     }
 
     @FXML
@@ -273,7 +455,8 @@ public class FXMLDocumentController implements Initializable {
 
         prodSearch = FXCollections.observableArrayList(prodCon.findProducts(category, catColumnsList, name, price, col1, col2, col3, col4, col5, col6));
         if (prodSearch == null) {
-            System.out.println("No products found"); // WHAT DO WE DO 
+            String msg = "No products found";
+            createModal(msg, AlertType.WARNING, true, "Warning", "Warning");
             return;
         }
 
@@ -457,22 +640,51 @@ public class FXMLDocumentController implements Initializable {
     }
 
     @FXML
+    private void searchForOrders() {
+
+        String searchCriteria = empOrderSearchField.getText();
+
+        if (searchCriteria.equals("")) {
+            return;
+        } else {
+            System.out.println(searchCriteria);
+            empOrderList = FXCollections.observableArrayList(); // INDSÆT METODE TIL AT FINDE LISTE AF ORDRE
+
+            empOrderView.getColumns().clear();
+            TableColumn orderNumber = new TableColumn("Order ID");
+            TableColumn orderPrice = new TableColumn("Price Total");
+            TableColumn orderDate = new TableColumn("Date");
+
+            orderNumber.setCellValueFactory(new PropertyValueFactory<>("orderID"));
+            orderPrice.setCellValueFactory(new PropertyValueFactory("priceTotal"));
+            orderDate.setCellValueFactory(new PropertyValueFactory("orderDate"));
+
+            empOrderView.getColumns().addAll(orderNumber, orderPrice, orderDate);
+
+            empOrderView.setItems(empOrderList);
+
+        }
+
+    }
+
+    @FXML
     private void showOrderHistory() {
-       // ObservableList<Order> orderList = FXCollections.observableArrayList();
         orderView.getColumns().clear();
 
         TableColumn orderNumber = new TableColumn("Order ID");
         TableColumn orderPrice = new TableColumn("Price Total");
         TableColumn orderDate = new TableColumn("Date");
+        TableColumn orderPaymentStatus = new TableColumn("Paid");
 
-//        orderList.add(new Order(1, 2.00, true));
-//        orderList.add(new Order(1, 1500.00, true));
-//        orderList.add(new Order(1, 20.00, true));
+
         orderNumber.setCellValueFactory(new PropertyValueFactory<>("orderID"));
         orderPrice.setCellValueFactory(new PropertyValueFactory("priceTotal"));
-        orderDate.setCellValueFactory(new PropertyValueFactory("orderDate"));
+        orderDate.setCellValueFactory(new PropertyValueFactory("orderDate"));   
+        orderPaymentStatus.setCellValueFactory(new PropertyValueFactory("isPaid"));
 
-        orderView.getColumns().addAll(orderNumber, orderPrice, orderDate);
+        
+
+        orderView.getColumns().addAll(orderNumber, orderPrice, orderDate, orderPaymentStatus);
 
         orderView.setRowFactory(tableView -> {
             final TableRow<Order> row = new TableRow<>();
@@ -483,7 +695,6 @@ public class FXMLDocumentController implements Initializable {
                     this.fixOrderHover(order.getKeySet());
                 } else {
                     orderProdView.getColumns().clear();
-                    //productDescArea.setText("Hover over a product to see its description.");
                 }
             });
 
@@ -493,11 +704,10 @@ public class FXMLDocumentController implements Initializable {
         orderView.setItems(orderList);
 
     }
-    
-    private void fixOrderHover(ObservableList<Product> p){
+
+    private void fixOrderHover(ObservableList<Product> p) {
         orderProdView.getColumns().clear();
-        
-        
+
         TableColumn<Map.Entry<Product, String>, String> column1 = new TableColumn<>("Product Name");
         column1.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Map.Entry<Product, String>, String>, ObservableValue<String>>() {
 
@@ -538,27 +748,19 @@ public class FXMLDocumentController implements Initializable {
         orderProdView.getColumns().setAll(column1, column2, column3);
 
         orderProdView.setItems(items);
-        
-        
-        
-        
-        
-//        TableColumn productName = new TableColumn("Order Contents:");
-//        
-//        productName.setCellValueFactory(new PropertyValueFactory<>("productName"));
-//        orderProdView.getColumns().add(productName);
-//        orderProdView.setItems(p);
     }
-    
+
     @FXML
-    private void makeOrderHandler(ActionEvent event){
+    private void makeOrderHandler(ActionEvent event) {
         Order order = new Order(activeUser.getBasket());
-        
+        System.out.println(order);
+        payHandler(event, order);
         orderList.add(order);
     }
 
     @FXML
     private void changeSelection(ActionEvent event) throws SQLException {
+        generalPane.setVisible(true);
         String s = (String) categoryDrop.getValue();
         catColumnsList = prodCon.getColumns(s);
         searchButton.setDisable(false);
@@ -632,14 +834,6 @@ public class FXMLDocumentController implements Initializable {
     }
 
     @FXML
-    private void handleLogout(ActionEvent event) {
-        loggedInPane.setVisible(false);
-        loginPane.setVisible(true);
-
-        activeUser = new Visitor(activeUser.getBasket());
-    }
-
-    @FXML
     private void createAccount(ActionEvent event) throws SQLException {
         String email = emailEntry.getText();
         String name = nameEntry.getText();
@@ -697,13 +891,106 @@ public class FXMLDocumentController implements Initializable {
         activeUser = new Visitor();
         accCon = new AccountsConnector("jdbc:postgresql://151.80.57.19:5432/admin_semester", "admin_willf", "2111993");
         prodCon = new ProductConnector("jdbc:postgresql://151.80.57.19:5432/admin_semester", "admin_willf", "2111993");
+        ListProperty<String> listProperty = new SimpleListProperty<String>(FXCollections.<String>observableArrayList());
+        listProperty.add("desktops");
+        listProperty.add("washingmachine");
+        listProperty.add("radio");
+        listProperty.add("tv");
+        listProperty.add("fridges");
+        listProperty.add("laptops");
+        categoryDrop.setItems(listProperty);
+        categoryDropMan.setItems(listProperty);
 
-        try {
-            categoryDrop.setItems(prodCon.getCategories());
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
+        generalPane.setVisible(false);
+
+        productTable.getColumns().clear();
+
+        tabPane.getTabs().removeAll(orderHistTab, prodManTab); //employeeOrderTab,
+        prodManCommitButton.setDisable(true);
+        
+        prodManView.getSelectionModel().selectedItemProperty().addListener((observable) -> {
+                final Product product = prodManView.getSelectionModel().selectedItemProperty().get();
+                if (product != null) {
+                    prodManArea.clear();
+                    prodManArea.setText(product.getDescription());
+                    prodManCommitButton.setDisable(true);
+                }
+            });
+
+        prodManArea.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(final ObservableValue<? extends String> observable, final String oldValue, final String newValue) {
+                prodManCommitButton.setDisable(false);
+            }
+        });
 
     }
+    
+    @FXML
+    private void payHandler(ActionEvent event, Order order) {
+        showDialog(((Node)event.getTarget()).getScene().getWindow(), order);
+    }
+    
+     private void showDialog(Window parent, Order order) {
+        boolean answer = false;
+        Parent root;
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("PaypalDialog.fxml"));
+            root = loader.load();
+            PaypalDialogController paypalDialogController = loader.getController();
+            Scene scene = new Scene(root);
+            Stage dialog = new Stage();
+                        
+            // Debug value
+            
+            paypalDialogController.setVariables(dialog, order);
+            
+            dialog.initOwner(parent);
+            dialog.initModality(Modality.WINDOW_MODAL); 
+            dialog.setScene(scene);
+            dialog.showAndWait();
+            
+            order = paypalDialogController.getOrder();
+            
+            if(!order.isIsPaid()){
+                String msg = "You didnt pay for the order";
+                createModal(msg, Alert.AlertType.WARNING, true);
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(FXMLDocumentController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+        
+        private void createModal(String message, Alert.AlertType type, boolean modal){
+                Alert alert = new Alert(type);
+                alert.setContentText(message);
+                if(modal){
+                    alert.initModality(Modality.APPLICATION_MODAL); 
+                }
+                alert.showAndWait();
+        }
+        private void createModal(String message, Alert.AlertType type, boolean modal, String title){
+                Alert alert = new Alert(type);
+                alert.setTitle(title);
+                
+                alert.setContentText(message);
+                if(modal){
+                    alert.initModality(Modality.APPLICATION_MODAL); 
+                }
+                alert.showAndWait();
+        }
+                private void createModal(String message, Alert.AlertType type, boolean modal, String title, String header){
+                Alert alert = new Alert(type);
+                alert.setTitle(title);
+                alert.setHeaderText(header);
+                alert.setContentText(message);
+                if(modal){
+                    alert.initModality(Modality.APPLICATION_MODAL); 
+                }
+                alert.showAndWait();
+        }
 
 }
+
+
+   
