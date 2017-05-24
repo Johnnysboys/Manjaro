@@ -19,6 +19,8 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -272,6 +274,9 @@ public class FXMLDocumentController implements Initializable {
             } else if (activeUser.getSec() == 2) { // Is an Employee
 
             } else if (activeUser.getSec() == 3) { // Is an Administrator
+                tabPane.getTabs().remove(signUpTab);
+                tabPane.getTabs().add(prodManTab);
+                        
 
             }
 
@@ -309,7 +314,7 @@ public class FXMLDocumentController implements Initializable {
     private void prodManSearchHandle(ActionEvent event) throws SQLException {
         String searchQuery = prodManSearchField.getText();
         String category = (String) categoryDropMan.getValue();
-
+        System.out.println("ree");
         ArrayList<String> columns = prodCon.getColumns(category);
 
         prodManView.getColumns().clear();
@@ -432,20 +437,6 @@ public class FXMLDocumentController implements Initializable {
                 System.out.println("Category not recognized.");
                 break;
         }
-
-//        prodManView.setRowFactory(tableView -> {
-//            final TableRow<Product> row = new TableRow<>();
-//
-//            row.selectedProperty().addListener((observable) -> {
-//                final Product product = row.getItem();
-//                //if (product != null) {
-//                    prodManArea.clear();
-//                    prodManArea.setText(product.getDescription());
-//                    prodManCommitButton.setDisable(true);
-//                //}
-//            });
-//            return row;
-//        });
 
         prodManView.setItems(prodManSearch);
     }
@@ -914,7 +905,7 @@ public class FXMLDocumentController implements Initializable {
 
         productTable.getColumns().clear();
 
-        tabPane.getTabs().removeAll(orderHistTab); //employeeOrderTab,
+        tabPane.getTabs().removeAll(orderHistTab, prodManTab); //employeeOrderTab,
         prodManCommitButton.setDisable(true);
         
         prodManView.getSelectionModel().selectedItemProperty().addListener((observable) -> {
