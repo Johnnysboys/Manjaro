@@ -34,6 +34,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
@@ -283,7 +284,9 @@ public class FXMLDocumentController implements Initializable {
 
         prodSearch = FXCollections.observableArrayList(prodCon.findProducts(category, catColumnsList, name, price, col1, col2, col3, col4, col5, col6));
         if (prodSearch == null) {
-            System.out.println("No products found"); // WHAT DO WE DO 
+            String msg = "No products found";
+            createModal(msg, AlertType.WARNING, true);
+//            System.out.println("No products found"); // WHAT DO WE DO 
             return;
         }
 
@@ -468,16 +471,12 @@ public class FXMLDocumentController implements Initializable {
 
     @FXML
     private void showOrderHistory() {
-       // ObservableList<Order> orderList = FXCollections.observableArrayList();
         orderView.getColumns().clear();
 
         TableColumn orderNumber = new TableColumn("Order ID");
         TableColumn orderPrice = new TableColumn("Price Total");
         TableColumn orderDate = new TableColumn("Date");
 
-//        orderList.add(new Order(1, 2.00, true));
-//        orderList.add(new Order(1, 1500.00, true));
-//        orderList.add(new Order(1, 20.00, true));
         orderNumber.setCellValueFactory(new PropertyValueFactory<>("orderID"));
         orderPrice.setCellValueFactory(new PropertyValueFactory("priceTotal"));
         orderDate.setCellValueFactory(new PropertyValueFactory("orderDate"));
@@ -744,7 +743,7 @@ public class FXMLDocumentController implements Initializable {
             order = paypalDialogController.getOrder();
             
             if(!order.isIsPaid()){
-                String msg = "You didn't pay for the order";
+                String msg = "You didnt pay for the order";
                 createModal(msg, Alert.AlertType.WARNING, true);
             }
         } catch (IOException ex) {
