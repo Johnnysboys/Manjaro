@@ -10,24 +10,26 @@ import electroshop.persons.LoggedInPerson;
 import electroshop.connectors.AccountsConnector;
 import electroshop.connectors.ProductConnector;
 import electroshop.persons.Person;
+import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.beans.property.ListProperty;
-import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -38,22 +40,13 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.MapValueFactory;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.Pane;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.Window;
 import javafx.util.Callback;
-import javafx.util.StringConverter;
 import products.Product;
-import products.Computer;
-import products.Desktop;
-import products.Fridge;
-import products.Laptop;
-import products.Radio;
-import products.Tv;
-import products.TvRadio;
-import products.WashingMachine;
-import products.WhiteGoods;
 
 /**
  *
@@ -171,6 +164,8 @@ public class FXMLDocumentController implements Initializable {
     private TableView orderProdView;
     @FXML
     private Button baskerOrderButton;
+    @FXML
+    private Button payButton;
 
     @FXML
     private void handleBasketUpdate(ActionEvent event) {
@@ -461,9 +456,6 @@ public class FXMLDocumentController implements Initializable {
         TableColumn orderPrice = new TableColumn("Price Total");
         TableColumn orderDate = new TableColumn("Date");
 
-//        orderList.add(new Order(1, 2.00, true));
-//        orderList.add(new Order(1, 1500.00, true));
-//        orderList.add(new Order(1, 20.00, true));
         orderNumber.setCellValueFactory(new PropertyValueFactory<>("orderID"));
         orderPrice.setCellValueFactory(new PropertyValueFactory("priceTotal"));
         orderDate.setCellValueFactory(new PropertyValueFactory("orderDate"));
@@ -549,7 +541,6 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private void makeOrderHandler(ActionEvent event){
         Order order = new Order(activeUser.getBasket());
-        
         orderList.add(order);
     }
 
@@ -670,5 +661,50 @@ public class FXMLDocumentController implements Initializable {
         }
 
     }
+
+    @FXML
+    private void payHandler(ActionEvent event) {
+        showDialog(payButton.getScene().getWindow());
+    }
+    
+     private void showDialog(Window parent) {
+        boolean answer = false;
+        Parent root;
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("PaypalDialog.fxml"));
+            root = loader.load();
+            PaypalDialogController paypalDialogController = loader.getController();
+            Scene scene = new Scene(root);
+            Stage dialog = new Stage();
+                        
+            // Debug value
+            Order order = new Order(1,1500, false);
+            
+            paypalDialogController.setVariables(dialog, order);
+            
+            dialog.initOwner(parent);
+            dialog.initModality(Modality.WINDOW_MODAL); 
+            dialog.setScene(scene);
+            dialog.showAndWait();
+            
+            order = paypalDialogController.getOrder();
+            
+            if(!order.isIsPaid()){
+                String msg = "You did'nt pay for the order";
+                createModal(msg, AlertType.WARNING, true);
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(FXMLDocumentController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+        
+        private void createModal(String message, AlertType type, boolean modal){
+                Alert alert = new Alert(type);
+                alert.setContentText(message);
+                if(modal){
+                    alert.initModality(Modality.WINDOW_MODAL); 
+                }
+                alert.showAndWait();
+        }
 
 }
