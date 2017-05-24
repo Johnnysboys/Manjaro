@@ -9,10 +9,10 @@
   <resources>
     <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
     <jar href="ElectroShop.jar" size="46019" download="eager" />
-    <jar href="lib/gson-2.3.1.jar" size="210856" download="eager" />
-    <jar href="lib/postgresql-42.1.1.jar" size="712452" download="eager" />
-    <jar href="lib/rest-api-sdk-1.13.1.jar" size="343625" download="eager" />
-    <jar href="lib/slf4j-api-1.7.25.jar" size="41203" download="eager" />
+    <jar href="lib\gson-2.3.1.jar" size="210856" download="eager" />
+    <jar href="lib\postgresql-42.1.1.jar" size="712452" download="eager" />
+    <jar href="lib\rest-api-sdk-1.13.1.jar" size="343625" download="eager" />
+    <jar href="lib\slf4j-api-1.7.25.jar" size="41203" download="eager" />
   </resources>
   <applet-desc  width="800" height="600" main-class="com.javafx.main.NoJavaFXFallback"  name="ElectroShop" >
     <param name="requiredFXVersion" value="8.0+"/>
