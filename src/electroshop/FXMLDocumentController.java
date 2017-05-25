@@ -8,6 +8,7 @@ package electroshop;
 import electroshop.persons.Visitor;
 import electroshop.persons.LoggedInPerson;
 import electroshop.connectors.AccountsConnector;
+import electroshop.connectors.OrderConnector;
 import electroshop.connectors.ProductConnector;
 import electroshop.persons.Person;
 import java.net.URL;
@@ -69,6 +70,7 @@ public class FXMLDocumentController implements Initializable {
     private LoggedInPerson loggedInPerson;
     private AccountsConnector accCon;
     private ProductConnector prodCon;
+    private OrderConnector orderCon;
     private ArrayList<String> catColumnsList;
     private ObservableList<Product> prodSearch;
     ObservableList<Order> orderList = FXCollections.observableArrayList();
@@ -457,8 +459,8 @@ public class FXMLDocumentController implements Initializable {
     }
 
     @FXML
-    private void showOrderHistory() {
-       // ObservableList<Order> orderList = FXCollections.observableArrayList();
+    private void showOrderHistory() throws SQLException {
+       ObservableList<Order> orderList = orderCon.getOrderOverview("jakob.bisander@hotmail.com");
         orderView.getColumns().clear();
 
         TableColumn orderNumber = new TableColumn("Order ID");
@@ -697,6 +699,7 @@ public class FXMLDocumentController implements Initializable {
         activeUser = new Visitor();
         accCon = new AccountsConnector("jdbc:postgresql://151.80.57.19:5432/admin_semester", "admin_willf", "2111993");
         prodCon = new ProductConnector("jdbc:postgresql://151.80.57.19:5432/admin_semester", "admin_willf", "2111993");
+        orderCon = new OrderConnector("jdbc:postgresql://151.80.57.19:5432/admin_semester", "admin_willf", "2111993");
 
         try {
             categoryDrop.setItems(prodCon.getCategories());

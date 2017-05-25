@@ -22,6 +22,12 @@ public class Order {
     private double priceTotal;
     private boolean isPaid;
     
+    public Order(int orderID, long date, int customerId) {
+    this.orderID = orderID;    
+    this.customerId = customerId;
+        this.orderDate = new Date(date);
+    }
+    
      public Order(int customerId, double priceTotal, boolean isPaid) {
         this.customerId = customerId;
         this.orderDate = new Date();
@@ -87,6 +93,10 @@ public class Order {
 
     public void setIsPaid(boolean isPaid) {
         this.isPaid = isPaid;
+    }
+    
+    public void addProduct(Product product, int amount){
+        productMap.put(product, amount);
     }
     
     public ObservableList<Product> getKeySet(){

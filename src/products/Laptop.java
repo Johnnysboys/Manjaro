@@ -17,7 +17,8 @@ public class Laptop extends Computer {
     private double weight;
     private int batteryLife;
 
-    public Laptop(double screenSize, double weight, int batteryLife, double processor, int ram, int harddrivesSize, int productId, String productName, double price, String productDesc) {
+    public Laptop(double screenSize, double weight, int batteryLife, double processor, 
+            int ram, int harddrivesSize, int productId, String productName, double price, String productDesc) {
         super(processor, ram, harddrivesSize, productId, productName, price, productDesc);
         this.screenSize = screenSize;
         this.weight = weight;
