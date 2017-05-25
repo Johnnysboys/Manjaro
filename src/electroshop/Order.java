@@ -13,15 +13,16 @@ import products.Product;
  * @author Troels
  */
 public class Order {
-    
+
     private int orderID;
     private Date orderDate;
     private HashMap<Product, Integer> productMap;
     private int customerId;
     private double priceTotal;
     private boolean isPaid;
-    
-     public Order(int customerId, double priceTotal, boolean isPaid) {
+    private boolean isDelivered = false;
+
+    public Order(int customerId, double priceTotal, boolean isPaid) {
         this.customerId = customerId;
         this.orderDate = new Date();
         this.priceTotal = priceTotal;
@@ -33,7 +34,7 @@ public class Order {
         this.priceTotal = basket.getTotal();
         this.orderDate = new Date();
     }
-    
+
     public Order(Basket basket, int orderID) {
         this.productMap = basket.getProductMap();
         this.priceTotal = basket.getTotal();
@@ -79,23 +80,29 @@ public class Order {
     public void setPriceTotal(double priceTotal) {
         this.priceTotal = priceTotal;
     }
+    public void setIsPaid(boolean isPaid) {
+        this.isPaid = isPaid;
+    }
 
+    public ObservableList<Product> getKeySet() {
+        List<Product> keys = new ArrayList<>(productMap.keySet());
+
+        ObservableList<Product> keyList = FXCollections.observableArrayList(keys);
+
+        return keyList;
+
+    }
+
+    public boolean isDelivered() {
+        return isDelivered;
+    }
     public boolean isIsPaid() {
         return isPaid;
     }
 
-    public void setIsPaid(boolean isPaid) {
-        this.isPaid = isPaid;
+    public void setIsDelivered(boolean isDelivered) {
+        this.isDelivered = isDelivered;
     }
-    
-    public ObservableList<Product> getKeySet(){
-        List<Product> keys = new ArrayList<>(productMap.keySet());
-        
-        ObservableList<Product> keyList = FXCollections.observableArrayList(keys);
-        
-        return keyList;
-        
-    }
-    
-    
+
+
 }
