@@ -6,12 +6,15 @@
 package electroshop.persons;
 
 import electroshop.Basket;
+import electroshop.FXMLDocumentController;
 
 /**
  *
  * @author Jakob
  */
 public class Administrator extends LoggedInPerson {
+    
+    FXMLDocumentController controller; 
 
     public Administrator(int id, String email, String name, String phone, String address, String pw, Basket basket) {
         super(id, email, name, phone, address, pw, 3, basket);
@@ -22,4 +25,6 @@ public class Administrator extends LoggedInPerson {
     public String getTitle() {
         return "(Administrator)";
     }
+    
+    
 }
