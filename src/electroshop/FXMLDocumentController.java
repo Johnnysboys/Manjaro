@@ -752,10 +752,14 @@ public class FXMLDocumentController implements Initializable {
 
     @FXML
     private void makeOrderHandler(ActionEvent event) {
+         if (basketView.getItems().isEmpty()){
+             baskerOrderButton.disableProperty();
+         }else{
         Order order = new Order(activeUser.getBasket());
         System.out.println(order);
         payHandler(event, order);
         orderList.add(order);
+    }
     }
 
     @FXML
