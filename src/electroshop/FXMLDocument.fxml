@@ -105,7 +105,6 @@
                         <Label layoutX="205.0" layoutY="463.0" text="Total Price:" />
                         <Label fx:id="totalLabel" layoutX="274.0" layoutY="463.0" text="0" />
                         <Button fx:id="baskerOrderButton" layoutX="23.0" layoutY="497.0" mnemonicParsing="false" onAction="#makeOrderHandler" text="Order and pay" />
-                        <!--<Button fx:id="payButton" layoutX="23.0" layoutY="497.0" mnemonicParsing="false" onAction="#payHandler" prefHeight="25.0" prefWidth="54.0" text="Pay" />-->
                      </children></AnchorPane>
             </content>
           </Tab>
