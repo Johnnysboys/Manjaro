@@ -68,6 +68,10 @@ public class Order {
     public void setOrderDate(Date orderDate) {
         this.orderDate = orderDate;
     }
+    
+    public void addProduct(Product product, int amount){
+        productMap.put(product, amount);
+    }
 
     public HashMap<Product, Integer> getProductMap() {
         return productMap;
