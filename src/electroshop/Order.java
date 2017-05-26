@@ -16,7 +16,7 @@ public class Order {
     
     private int orderID;
     private Date orderDate;
-    private HashMap<Product, Integer> productMap;
+    private HashMap<Product, Integer> productMap = new HashMap<>();
     private int customerId;
     private double priceTotal;
     private boolean isPaid;
@@ -40,7 +40,14 @@ public class Order {
         this.priceTotal = priceTotal;
         this.isPaid = isPaid;
     }
-
+     
+     public Order(int orderId, double priceTotal, boolean isPaid, long date) {
+        this.orderID = orderId;
+        this.orderDate = new Date(date);
+        this.priceTotal = priceTotal;
+        this.isPaid = isPaid;
+    }
+     
     public Order(Basket basket) {
         this.productMap = basket.getProductMap();
         this.priceTotal = basket.getTotal();

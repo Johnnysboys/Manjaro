@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import products.Desktop;
@@ -32,38 +33,80 @@ public class OrderConnector extends SuperDB {
 
     public ObservableList<Order> getOrderOverview(String email) throws SQLException {
         ObservableList<Order> orderOverview = FXCollections.observableArrayList();
-        String query = "SELECT orders.orderdate, orders.customerid, orderlines.*, products.name, products.description, products.price, products.producttype FROM orders\n" +
-                        "JOIN accounts ON accounts.id = orders.customerID \n" +
-                        "JOIN orderlines ON orders.orderID = orderlines.orderID\n" +
-                        "JOIN products ON orderlines.productid = products.id\n" +
-                        "WHERE accounts.email = ?;";
+        String query = "SELECT orders.orderdate, orders.customerid, orderlines.*, products.name, products.description, products.price, products.producttype FROM orders\n"
+                + "JOIN accounts ON accounts.id = orders.customerID \n"
+                + "JOIN orderlines ON orders.orderID = orderlines.orderID\n"
+                + "JOIN products ON orderlines.productid = products.id\n"
+                + "WHERE accounts.email = ?;";
 
         PreparedStatement ps = this.getCon().prepareStatement(query);
         ps.setString(1, email);
         ResultSet rs = ps.executeQuery();
         int checkingId = -1;
         Order currentOrder = null;
+        Product product = null;
         while (rs.next()) {
-            Product product = new GenericProducts(rs.getInt("productid"), rs.getString("name"), rs.getDouble("price"), rs.getString("description"));
-            if(checkingId != rs.getInt("orderid")){
-                if(!rs.isFirst()){
+            product = new GenericProducts(rs.getInt("productid"), rs.getString("name"), rs.getDouble("price"), rs.getString("description"));
+            if (checkingId != rs.getInt("orderid")) {
+                if (!rs.isFirst()) {
                     orderOverview.add(currentOrder);
                 }
                 System.out.println("New Order");
-                currentOrder = new Order(rs.getInt("orderid"), 1, false);
+                currentOrder = new Order(rs.getInt("orderid"), rs.getDouble("price"), false, rs.getLong("orderdate"));
                 checkingId = rs.getInt("orderid");
-            } 
-            System.out.println("Adding product " + rs.getString("name"));
-            currentOrder.addProduct(product, rs.getInt("amount"));
-            if(rs.isLast()){
+            }
+            System.out.println(rs.toString());
+            System.out.println(rs.getString("name"));
+
+            if (currentOrder != null && product != null) {
+                currentOrder.addProduct(product, rs.getInt("amount"));
+            } else {
+                System.out.println("Current Order is null!");
+            }
+            if (rs.isLast()) {
                 orderOverview.add(currentOrder);
             }
+
         }
         return orderOverview;
     }
-    
-    public boolean insertOrder(Order order){
-        String query = "insert into orders";
+
+    public boolean insertOrder(Order order) throws SQLException {
+        String orderLineQuery = "insert into orderlines (orderid, productid, amount, price) VALUES (?,?,?,?)";
+        String query = "insert into orders (orderdate, customerid) VALUES (?, ?) RETURNING orderid";
+        PreparedStatement ps = this.getCon().prepareStatement(query);
+        ps.setLong(1, order.getOrderDate().getTime());
+        ps.setInt(2, order.getCustomerId());
+        
+        ResultSet rs = ps.executeQuery();
+        
+        rs.next();
+        
+        int orderId = rs.getInt("orderid");
+        
+        ps.close();
+        rs.close();
+        Map<Product, Integer> orderLines = order.getProductMap();
+        
+        Statement statement = this.getCon().createStatement();
+        
+        PreparedStatement orderLineStatement = this.getCon().prepareStatement(orderLineQuery);
+        for(Product p : orderLines.keySet()){
+            orderLineStatement.setInt(1, orderId);
+            orderLineStatement.setInt(2, p.getProductId());
+            System.out.println(orderLines.get(p));
+            orderLineStatement.setInt(3, Integer.valueOf(orderLines.get(p)));
+            orderLineStatement.setDouble(4, p.getPrice());
+            orderLineStatement.addBatch();
+            
+            
+        }
+        
+        orderLineStatement.executeBatch();
+        orderLineStatement.close();
+        
+        
+        
         return true;
     }
 
