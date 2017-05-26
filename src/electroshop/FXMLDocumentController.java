@@ -56,7 +56,6 @@ import javafx.stage.Window;
 import javafx.util.Callback;
 import products.Product;
 
-
 /**
  *
  * @author Jakob
@@ -148,7 +147,7 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private Pane column6Pane;
     @FXML
-    private Button searchButton;    
+    private Button searchButton;
     @FXML
     private Button payButton;
 
@@ -276,7 +275,6 @@ public class FXMLDocumentController implements Initializable {
             } else if (activeUser.getSec() == 3) { // Is an Administrator
                 tabPane.getTabs().remove(signUpTab);
                 tabPane.getTabs().add(prodManTab);
-                        
 
             }
 
@@ -293,6 +291,7 @@ public class FXMLDocumentController implements Initializable {
         activeUser = new Visitor(activeUser.getBasket());
         tabPane.getTabs().remove(orderHistTab);
         tabPane.getTabs().add(signUpTab);
+        loggedInPerson = null;
     }
 
     @FXML
@@ -676,13 +675,10 @@ public class FXMLDocumentController implements Initializable {
         TableColumn orderDate = new TableColumn("Date");
         TableColumn orderPaymentStatus = new TableColumn("Paid");
 
-
         orderNumber.setCellValueFactory(new PropertyValueFactory<>("orderID"));
         orderPrice.setCellValueFactory(new PropertyValueFactory("priceTotal"));
-        orderDate.setCellValueFactory(new PropertyValueFactory("orderDate"));   
+        orderDate.setCellValueFactory(new PropertyValueFactory("orderDate"));
         orderPaymentStatus.setCellValueFactory(new PropertyValueFactory("isPaid"));
-
-        
 
         orderView.getColumns().addAll(orderNumber, orderPrice, orderDate, orderPaymentStatus);
 
@@ -752,10 +748,20 @@ public class FXMLDocumentController implements Initializable {
 
     @FXML
     private void makeOrderHandler(ActionEvent event) {
-        Order order = new Order(activeUser.getBasket());
-        System.out.println(order);
-        payHandler(event, order);
+        if (basketView.getItems().isEmpty()) {
+            baskerOrderButton.disableProperty();
+        } else {
+            Order order = new Order(activeUser.getBasket());
+            System.out.println(order);
+
+        if (loggedInPerson == null){
+               visitorBuyHandler(event,order);
+               payHandler(event, order);
+        }else{
+               payHandler(event, order);
+          }
         orderList.add(order);
+        }
     }
 
     @FXML
@@ -854,7 +860,8 @@ public class FXMLDocumentController implements Initializable {
         }
 
     }
-        @FXML
+
+    @FXML
     private void handlerClosePoogramButton(ActionEvent event) {
         Alert closeAlert = new Alert(Alert.AlertType.WARNING);
         closeAlert.setTitle("Do you want to close the program?");
@@ -872,7 +879,7 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private void handlerHowToButton(ActionEvent event) {
         Text t;
-        
+
         Alert closeAlert = new Alert(Alert.AlertType.NONE);
         closeAlert.setTitle("How to use the program?");
         closeAlert.setHeaderText("This is how you use the program!");
@@ -882,9 +889,8 @@ public class FXMLDocumentController implements Initializable {
         closeAlert.getButtonTypes().setAll(closeButton);
         Optional<ButtonType> result = closeAlert.showAndWait();
         closeAlert.getDialogPane().getButtonTypes().add(ButtonType.OK);
-        
-    }
 
+    }
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -907,15 +913,15 @@ public class FXMLDocumentController implements Initializable {
 
         tabPane.getTabs().removeAll(orderHistTab, prodManTab); //employeeOrderTab,
         prodManCommitButton.setDisable(true);
-        
+
         prodManView.getSelectionModel().selectedItemProperty().addListener((observable) -> {
-                final Product product = prodManView.getSelectionModel().selectedItemProperty().get();
-                if (product != null) {
-                    prodManArea.clear();
-                    prodManArea.setText(product.getDescription());
-                    prodManCommitButton.setDisable(true);
-                }
-            });
+            final Product product = prodManView.getSelectionModel().selectedItemProperty().get();
+            if (product != null) {
+                prodManArea.clear();
+                prodManArea.setText(product.getDescription());
+                prodManCommitButton.setDisable(true);
+            }
+        });
 
         prodManArea.textProperty().addListener(new ChangeListener<String>() {
             @Override
@@ -925,13 +931,44 @@ public class FXMLDocumentController implements Initializable {
         });
 
     }
+
+    @FXML
+    private void visitorBuyHandler(ActionEvent event, Order order) {
+            showVisitorBuy(((Node) event.getTarget()).getScene().getWindow(), order);
+        }
     
+
     @FXML
     private void payHandler(ActionEvent event, Order order) {
-        showDialog(((Node)event.getTarget()).getScene().getWindow(), order);
+        showDialog(((Node) event.getTarget()).getScene().getWindow(), order);
     }
-    
-     private void showDialog(Window parent, Order order) {
+
+    private void showVisitorBuy(Window parent, Order order) {
+        boolean answer = false;
+        Parent root;
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("VisitorBuy.fxml"));
+            root = loader.load();
+            VisitorBuyController visitorBuyController = loader.getController();
+            Scene scene = new Scene(root);
+            Stage dialog = new Stage();
+
+            // Debug value
+            visitorBuyController.setVariables(dialog, order);
+
+            dialog.initOwner(parent);
+            dialog.initModality(Modality.WINDOW_MODAL);
+            dialog.setScene(scene);
+            dialog.showAndWait();
+
+            order = visitorBuyController.getOrder();
+
+        } catch (IOException ex) {
+            Logger.getLogger(FXMLDocumentController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void showDialog(Window parent, Order order) {
         boolean answer = false;
         Parent root;
         try {
@@ -940,57 +977,56 @@ public class FXMLDocumentController implements Initializable {
             PaypalDialogController paypalDialogController = loader.getController();
             Scene scene = new Scene(root);
             Stage dialog = new Stage();
-                        
+
             // Debug value
-            
             paypalDialogController.setVariables(dialog, order);
-            
+
             dialog.initOwner(parent);
-            dialog.initModality(Modality.WINDOW_MODAL); 
+            dialog.initModality(Modality.WINDOW_MODAL);
             dialog.setScene(scene);
             dialog.showAndWait();
-            
+
             order = paypalDialogController.getOrder();
-            
-            if(!order.isIsPaid()){
+
+            if (!order.isIsPaid()) {
                 String msg = "You didnt pay for the order";
                 createModal(msg, Alert.AlertType.WARNING, true);
             }
+
         } catch (IOException ex) {
             Logger.getLogger(FXMLDocumentController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-        
-        private void createModal(String message, Alert.AlertType type, boolean modal){
-                Alert alert = new Alert(type);
-                alert.setContentText(message);
-                if(modal){
-                    alert.initModality(Modality.APPLICATION_MODAL); 
-                }
-                alert.showAndWait();
+
+    private void createModal(String message, Alert.AlertType type, boolean modal) {
+        Alert alert = new Alert(type);
+        alert.setContentText(message);
+        if (modal) {
+            alert.initModality(Modality.APPLICATION_MODAL);
         }
-        private void createModal(String message, Alert.AlertType type, boolean modal, String title){
-                Alert alert = new Alert(type);
-                alert.setTitle(title);
-                
-                alert.setContentText(message);
-                if(modal){
-                    alert.initModality(Modality.APPLICATION_MODAL); 
-                }
-                alert.showAndWait();
+        alert.showAndWait();
+    }
+
+    private void createModal(String message, Alert.AlertType type, boolean modal, String title) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+
+        alert.setContentText(message);
+        if (modal) {
+            alert.initModality(Modality.APPLICATION_MODAL);
         }
-                private void createModal(String message, Alert.AlertType type, boolean modal, String title, String header){
-                Alert alert = new Alert(type);
-                alert.setTitle(title);
-                alert.setHeaderText(header);
-                alert.setContentText(message);
-                if(modal){
-                    alert.initModality(Modality.APPLICATION_MODAL); 
-                }
-                alert.showAndWait();
+        alert.showAndWait();
+    }
+
+    private void createModal(String message, Alert.AlertType type, boolean modal, String title, String header) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(message);
+        if (modal) {
+            alert.initModality(Modality.APPLICATION_MODAL);
         }
+        alert.showAndWait();
+    }
 
 }
-
-
-   
