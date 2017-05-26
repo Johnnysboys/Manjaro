@@ -647,7 +647,7 @@ public class FXMLDocumentController implements Initializable {
             return;
         } else {
             System.out.println(searchCriteria);
-            empOrderList = FXCollections.observableArrayList(); // INDSÆT METODE TIL AT FINDE LISTE AF ORDRE
+            empOrderList = FXCollections.observableArrayList(); // INDSï¿½T METODE TIL AT FINDE LISTE AF ORDRE
 
             empOrderView.getColumns().clear();
             TableColumn orderNumber = new TableColumn("Order ID");
@@ -897,7 +897,7 @@ public class FXMLDocumentController implements Initializable {
         activeUser = new Visitor();
         accCon = new AccountsConnector("jdbc:postgresql://151.80.57.19:5432/admin_semester", "admin_willf", "2111993");
         prodCon = new ProductConnector("jdbc:postgresql://151.80.57.19:5432/admin_semester", "admin_willf", "2111993");
-        orderCon = new OrderConnector("jdbc:postgresql://151.80.57.19:5432/admin_semester", "admin_willf", "2111993");
+//        orderCon = new OrderConnector("jdbc:postgresql://151.80.57.19:5432/admin_semester", "admin_willf", "2111993");
         ListProperty<String> listProperty = new SimpleListProperty<String>(FXCollections.<String>observableArrayList());
         listProperty.add("desktops");
         listProperty.add("washingmachine");
