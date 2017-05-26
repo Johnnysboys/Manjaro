@@ -17,7 +17,7 @@ public class Order {
     
     private int orderID;
     private Date orderDate;
-    private HashMap<Product, Integer> productMap;
+    private HashMap<Product, Integer> productMap = new HashMap<>();
     private int customerId;
     private double priceTotal;
     private boolean isPaid;
@@ -107,6 +107,5 @@ public class Order {
         return keyList;
         
     }
-    
     
 }
