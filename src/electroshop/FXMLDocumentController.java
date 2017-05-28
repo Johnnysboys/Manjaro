@@ -8,12 +8,14 @@ package electroshop;
 import electroshop.persons.Visitor;
 import electroshop.persons.LoggedInPerson;
 import electroshop.connectors.AccountsConnector;
+import electroshop.connectors.OrderConnector;
 import electroshop.connectors.ProductConnector;
 import electroshop.persons.Person;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -66,6 +68,7 @@ public class FXMLDocumentController implements Initializable {
     private LoggedInPerson loggedInPerson;
     private AccountsConnector accCon;
     private ProductConnector prodCon;
+    private OrderConnector orderCon;
     private ArrayList<String> catColumnsList;
     private ObservableList<Product> prodSearch;
     ObservableList<Order> orderList = FXCollections.observableArrayList();
@@ -148,8 +151,6 @@ public class FXMLDocumentController implements Initializable {
     private Pane column6Pane;
     @FXML
     private Button searchButton;
-    @FXML
-    private Button payButton;
 
     @FXML
     private TableView productTable;
@@ -229,7 +230,7 @@ public class FXMLDocumentController implements Initializable {
         column2.setCellValueFactory((TableColumn.CellDataFeatures<Map.Entry<Product, String>, String> p) -> new SimpleStringProperty(String.valueOf(p.getValue().getKey().getPrice())));
 
         TableColumn<Map.Entry<String, String>, String> column3 = new TableColumn<>("Quantity");
-        column3.setCellValueFactory((TableColumn.CellDataFeatures<Map.Entry<String, String>, String> p) -> new SimpleStringProperty(p.getValue().getValue()));
+        column3.setCellValueFactory((TableColumn.CellDataFeatures<Map.Entry<String, String>, String> p) -> new SimpleStringProperty(String.valueOf(p.getValue().getValue())));
 
         ObservableList<Map.Entry<String, String>> items = FXCollections.observableArrayList(activeUser.getBasket().getProductMap().entrySet());
 
@@ -603,7 +604,7 @@ public class FXMLDocumentController implements Initializable {
                             btn.setOnAction((ActionEvent event)
                                     -> {
                                 Product product = getTableView().getItems().get(getIndex());
-                                activeUser.getBasket().addProduct(product, "1");
+                                activeUser.getBasket().addProduct(product, 1);
                             });
                             setGraphic(btn);
                             setText(null);
@@ -639,7 +640,7 @@ public class FXMLDocumentController implements Initializable {
     }
 
     @FXML
-    private void searchForOrders() {
+    private void searchForOrders() throws SQLException {
 
         String searchCriteria = empOrderSearchField.getText();
 
@@ -647,7 +648,7 @@ public class FXMLDocumentController implements Initializable {
             return;
         } else {
             System.out.println(searchCriteria);
-            empOrderList = FXCollections.observableArrayList(); // INDS�T METODE TIL AT FINDE LISTE AF ORDRE
+            empOrderList = orderCon.getOrderOverview(searchCriteria); 
 
             empOrderView.getColumns().clear();
             TableColumn orderNumber = new TableColumn("Order ID");
@@ -747,7 +748,7 @@ public class FXMLDocumentController implements Initializable {
     }
 
     @FXML
-    private void makeOrderHandler(ActionEvent event) {
+    private void makeOrderHandler(ActionEvent event) throws SQLException {
         if (basketView.getItems().isEmpty()) {
             baskerOrderButton.disableProperty();
         } else {
@@ -758,6 +759,12 @@ public class FXMLDocumentController implements Initializable {
                visitorBuyHandler(event,order);
                payHandler(event, order);
         }else{
+            order.setAdress(loggedInPerson.getAddress());
+            order.setCustomerId(loggedInPerson.getId());
+            order.setEmail(loggedInPerson.getEmail());
+            order.setName(loggedInPerson.getName());
+            order.setPhoneNumber(loggedInPerson.getPhone());
+            
                payHandler(event, order);
           }
         orderList.add(order);
@@ -897,7 +904,7 @@ public class FXMLDocumentController implements Initializable {
         activeUser = new Visitor();
         accCon = new AccountsConnector("jdbc:postgresql://151.80.57.19:5432/admin_semester", "admin_willf", "2111993");
         prodCon = new ProductConnector("jdbc:postgresql://151.80.57.19:5432/admin_semester", "admin_willf", "2111993");
-//        orderCon = new OrderConnector("jdbc:postgresql://151.80.57.19:5432/admin_semester", "admin_willf", "2111993");
+        orderCon = new OrderConnector("jdbc:postgresql://151.80.57.19:5432/admin_semester", "admin_willf", "2111993");
         ListProperty<String> listProperty = new SimpleListProperty<String>(FXCollections.<String>observableArrayList());
         listProperty.add("desktops");
         listProperty.add("washingmachine");
@@ -933,14 +940,12 @@ public class FXMLDocumentController implements Initializable {
 
     }
 
-    @FXML
     private void visitorBuyHandler(ActionEvent event, Order order) {
             showVisitorBuy(((Node) event.getTarget()).getScene().getWindow(), order);
         }
     
 
-    @FXML
-    private void payHandler(ActionEvent event, Order order) {
+    private void payHandler(ActionEvent event, Order order) throws SQLException {
         showDialog(((Node) event.getTarget()).getScene().getWindow(), order);
     }
 
@@ -969,7 +974,7 @@ public class FXMLDocumentController implements Initializable {
         }
     }
 
-    private void showDialog(Window parent, Order order) {
+    private void showDialog(Window parent, Order order) throws SQLException {
         boolean answer = false;
         Parent root;
         try {
@@ -992,6 +997,9 @@ public class FXMLDocumentController implements Initializable {
             if (!order.isIsPaid()) {
                 String msg = "You didnt pay for the order";
                 createModal(msg, Alert.AlertType.WARNING, true);
+               } else {
+                orderCon.insertOrder(order);
+                System.out.println(order.getOrderDate());
             }
 
         } catch (IOException ex) {
