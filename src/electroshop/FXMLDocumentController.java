@@ -768,7 +768,6 @@ public class FXMLDocumentController implements Initializable {
                payHandler(event, order);
           }
         orderList.add(order);
-        orderCon.insertOrder(order);
         }
     }
 

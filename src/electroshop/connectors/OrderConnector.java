@@ -10,15 +10,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import products.Desktop;
-import products.Fridge;
 import products.GenericProducts;
-import products.Laptop;
 import products.Product;
 
 /**
@@ -97,15 +92,9 @@ public class OrderConnector extends SuperDB {
             orderLineStatement.setInt(3, orderLines.get(p));
             orderLineStatement.setDouble(4, p.getPrice());
             orderLineStatement.addBatch();
-            
-            
         }
-        
         orderLineStatement.executeBatch();
         orderLineStatement.close();
-        
-        
-        
         return true;
     }
 
