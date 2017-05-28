@@ -230,7 +230,7 @@ public class FXMLDocumentController implements Initializable {
         column2.setCellValueFactory((TableColumn.CellDataFeatures<Map.Entry<Product, String>, String> p) -> new SimpleStringProperty(String.valueOf(p.getValue().getKey().getPrice())));
 
         TableColumn<Map.Entry<String, String>, String> column3 = new TableColumn<>("Quantity");
-        column3.setCellValueFactory((TableColumn.CellDataFeatures<Map.Entry<String, String>, String> p) -> new SimpleStringProperty(p.getValue().getValue()));
+        column3.setCellValueFactory((TableColumn.CellDataFeatures<Map.Entry<String, String>, String> p) -> new SimpleStringProperty(String.valueOf(p.getValue().getValue())));
 
         ObservableList<Map.Entry<String, String>> items = FXCollections.observableArrayList(activeUser.getBasket().getProductMap().entrySet());
 
@@ -604,7 +604,7 @@ public class FXMLDocumentController implements Initializable {
                             btn.setOnAction((ActionEvent event)
                                     -> {
                                 Product product = getTableView().getItems().get(getIndex());
-                                activeUser.getBasket().addProduct(product, "1");
+                                activeUser.getBasket().addProduct(product, 1);
                             });
                             setGraphic(btn);
                             setText(null);

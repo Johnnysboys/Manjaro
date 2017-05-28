@@ -94,8 +94,7 @@ public class OrderConnector extends SuperDB {
         for(Product p : orderLines.keySet()){
             orderLineStatement.setInt(1, orderId);
             orderLineStatement.setInt(2, p.getProductId());
-            System.out.println(orderLines.get(p));
-            orderLineStatement.setInt(3, Integer.valueOf(orderLines.get(p)));
+            orderLineStatement.setInt(3, orderLines.get(p));
             orderLineStatement.setDouble(4, p.getPrice());
             orderLineStatement.addBatch();
             
