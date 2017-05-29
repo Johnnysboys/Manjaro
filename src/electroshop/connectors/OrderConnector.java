@@ -58,11 +58,13 @@ public class OrderConnector extends SuperDB {
             } else {
                 System.out.println("Current Order is null!");
             }
+            currentOrder.setPriceTotal(currentOrder.getCalcTotal());
             if (rs.isLast()) {
                 orderOverview.add(currentOrder);
             }
-
+            
         }
+        
         return orderOverview;
     }
 

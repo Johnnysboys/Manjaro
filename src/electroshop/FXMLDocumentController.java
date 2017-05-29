@@ -172,7 +172,6 @@ public class FXMLDocumentController implements Initializable {
     private TableView<Order> orderView;
     @FXML
     private Button showOrderButton;
-    @FXML
     private TableView orderProdView;
     @FXML
     private Button baskerOrderButton;
@@ -188,8 +187,6 @@ public class FXMLDocumentController implements Initializable {
     private Tab employeeOrderTab;
     @FXML
     private TableView<Order> empOrderView;
-    @FXML
-    private TableView empOrderProdView;
     @FXML
     private Button empFindButton;
     @FXML
@@ -255,8 +252,6 @@ public class FXMLDocumentController implements Initializable {
         if (loggedInPerson == null) {
             createModal("Unknown user or password, try again.", AlertType.ERROR, true, "Login", "Login error");
         } else {
-
-            System.out.println("LOGIN SUCCESFULL");
             activeUser = loggedInPerson;
             loginPane.setVisible(false);
 
@@ -268,12 +263,14 @@ public class FXMLDocumentController implements Initializable {
             loggedInPane.setVisible(true);
             createModal("Logged in as " + sb.toString(), AlertType.CONFIRMATION, true, "Login", "Login successful");
 
-            if (activeUser.getSec() == 1) { // Is a Customer
+            if (activeUser.getSec() == 1) {         // Is a Customer
                 tabPane.getTabs().add(orderHistTab);
                 tabPane.getTabs().remove(signUpTab);
-            } else if (activeUser.getSec() == 2) { // Is an Employee
+            } else if (activeUser.getSec() == 2) {  // Is an Employee
+                tabPane.getTabs().add(employeeOrderTab);
+                tabPane.getTabs().remove(signUpTab);
 
-            } else if (activeUser.getSec() == 3) { // Is an Administrator
+            } else if (activeUser.getSec() == 3) {  // Is an Administrator
                 tabPane.getTabs().remove(signUpTab);
                 tabPane.getTabs().add(prodManTab);
 
@@ -291,6 +288,8 @@ public class FXMLDocumentController implements Initializable {
 
         activeUser = new Visitor(activeUser.getBasket());
         tabPane.getTabs().remove(orderHistTab);
+        tabPane.getTabs().remove(employeeOrderTab);
+        tabPane.getTabs().remove(prodManTab);
         tabPane.getTabs().add(signUpTab);
         loggedInPerson = null;
     }
@@ -298,11 +297,7 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private void handleManCommit(ActionEvent event) throws SQLException {
         int id = prodManView.getSelectionModel().getSelectedItem().getProductId();
-        System.out.println(id);
         String newDesc = prodManArea.getText();
-        //System.out.println(prodManView.getSelectionModel().getSelectedItem().getProductId());
-
-        System.out.println(newDesc);
         prodCon.changeProductDesc(id, newDesc);
         System.out.println("");
         prodManArea.clear();
@@ -314,7 +309,6 @@ public class FXMLDocumentController implements Initializable {
     private void prodManSearchHandle(ActionEvent event) throws SQLException {
         String searchQuery = prodManSearchField.getText();
         String category = (String) categoryDropMan.getValue();
-        System.out.println("ree");
         ArrayList<String> columns = prodCon.getColumns(category);
 
         prodManView.getColumns().clear();
@@ -359,7 +353,7 @@ public class FXMLDocumentController implements Initializable {
                 c7.setCellValueFactory(new PropertyValueFactory<Product, String>("capacity"));
                 break;
             }
-            case "fridges": {
+            case "freezers": {
                 TableColumn c1 = new TableColumn(columns.get(1));
                 TableColumn c2 = new TableColumn(columns.get(2));
                 TableColumn c4 = new TableColumn(columns.get(4));
@@ -462,9 +456,10 @@ public class FXMLDocumentController implements Initializable {
 
         productTable.setEditable(true);
         int columnAmount = catColumnsList.size();
-        System.out.println(columnAmount);
+        columnAmount--;
         productTable.getColumns().clear();
-
+        System.out.println(category);
+        System.out.println(catColumnsList.toString());
         switch (category) {
             case "desktops": {
                 TableColumn c1 = new TableColumn(catColumnsList.get(1));
@@ -503,14 +498,14 @@ public class FXMLDocumentController implements Initializable {
                 c7.setCellValueFactory(new PropertyValueFactory<Product, String>("capacity"));
                 break;
             }
-            case "fridges": {
+            case "freezers": {
                 TableColumn c1 = new TableColumn(catColumnsList.get(1));
                 TableColumn c2 = new TableColumn(catColumnsList.get(2));
                 TableColumn c4 = new TableColumn(catColumnsList.get(4));
                 TableColumn c5 = new TableColumn(catColumnsList.get(5));
                 TableColumn c6 = new TableColumn(catColumnsList.get(6));
                 TableColumn c7 = new TableColumn(catColumnsList.get(7));
-
+                System.out.println("in freeze");
                 productTable.getColumns().addAll(c1, c2, c4, c5, c6, c7);
                 c1.setCellValueFactory(new PropertyValueFactory<Product, String>("productName"));
                 c2.setCellValueFactory(new PropertyValueFactory<Product, String>("price"));
@@ -648,7 +643,7 @@ public class FXMLDocumentController implements Initializable {
             return;
         } else {
             System.out.println(searchCriteria);
-            empOrderList = orderCon.getOrderOverview(searchCriteria); 
+            empOrderList = orderCon.getOrderOverview(searchCriteria);
 
             empOrderView.getColumns().clear();
             TableColumn orderNumber = new TableColumn("Order ID");
@@ -674,77 +669,19 @@ public class FXMLDocumentController implements Initializable {
         TableColumn orderNumber = new TableColumn("Order ID");
         TableColumn orderPrice = new TableColumn("Price Total");
         TableColumn orderDate = new TableColumn("Date");
-        TableColumn orderPaymentStatus = new TableColumn("Paid");
 
         orderNumber.setCellValueFactory(new PropertyValueFactory<>("orderID"));
         orderPrice.setCellValueFactory(new PropertyValueFactory("priceTotal"));
         orderDate.setCellValueFactory(new PropertyValueFactory("orderDate"));
-        orderPaymentStatus.setCellValueFactory(new PropertyValueFactory("isPaid"));
 
-        orderView.getColumns().addAll(orderNumber, orderPrice, orderDate, orderPaymentStatus);
+        orderView.getColumns().addAll(orderNumber, orderPrice, orderDate);
 
-        orderView.setRowFactory(tableView -> {
-            final TableRow<Order> row = new TableRow<>();
+        try {
+            orderView.setItems(orderCon.getOrderOverview(loggedInPerson.getEmail()));
+        } catch (SQLException ex) {
+            Logger.getLogger(FXMLDocumentController.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
-            row.hoverProperty().addListener((observable) -> {
-                final Order order = row.getItem();
-                if (row.isHover() && order != null) {
-                    this.fixOrderHover(order.getKeySet());
-                } else {
-                    orderProdView.getColumns().clear();
-                }
-            });
-
-            return row;
-        });
-
-        orderView.setItems(orderList);
-
-    }
-
-    private void fixOrderHover(ObservableList<Product> p) {
-        orderProdView.getColumns().clear();
-
-        TableColumn<Map.Entry<Product, String>, String> column1 = new TableColumn<>("Product Name");
-        column1.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Map.Entry<Product, String>, String>, ObservableValue<String>>() {
-
-            @Override
-            public ObservableValue<String> call(TableColumn.CellDataFeatures<Map.Entry<Product, String>, String> p) {
-
-                return new SimpleStringProperty(p.getValue().getKey().getProductName());
-            }
-        });
-
-        TableColumn<Map.Entry<Product, String>, String> column2 = new TableColumn<>("Price");
-        column2.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Map.Entry<Product, String>, String>, ObservableValue<String>>() {
-
-            @Override
-            public ObservableValue<String> call(TableColumn.CellDataFeatures<Map.Entry<Product, String>, String> p) {
-
-                return new SimpleStringProperty(String.valueOf(p.getValue().getKey().getPrice()));
-            }
-        });
-
-        TableColumn<Map.Entry<String, String>, String> column3 = new TableColumn<>("Quantity");
-        column3.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Map.Entry<String, String>, String>, ObservableValue<String>>() {
-
-            @Override
-            public ObservableValue<String> call(TableColumn.CellDataFeatures<Map.Entry<String, String>, String> p) {
-
-                return new SimpleStringProperty(p.getValue().getValue());
-            }
-        });
-
-        ObservableList<Map.Entry<String, String>> items = FXCollections.observableArrayList(activeUser.getBasket().getProductMap().entrySet());
-
-        column1.setMaxWidth(300);
-        column2.setMaxWidth(75);
-        column3.setMaxWidth(75);
-        orderProdView.setMaxWidth(450);
-
-        orderProdView.getColumns().setAll(column1, column2, column3);
-
-        orderProdView.setItems(items);
     }
 
     @FXML
@@ -753,21 +690,20 @@ public class FXMLDocumentController implements Initializable {
             baskerOrderButton.disableProperty();
         } else {
             Order order = new Order(activeUser.getBasket());
-            System.out.println(order);
 
-        if (loggedInPerson == null){
-               visitorBuyHandler(event,order);
-               payHandler(event, order);
-        }else{
-            order.setAdress(loggedInPerson.getAddress());
-            order.setCustomerId(loggedInPerson.getId());
-            order.setEmail(loggedInPerson.getEmail());
-            order.setName(loggedInPerson.getName());
-            order.setPhoneNumber(loggedInPerson.getPhone());
-            
-               payHandler(event, order);
-          }
-        orderList.add(order);
+            if (loggedInPerson == null) {
+                visitorBuyHandler(event, order);
+                payHandler(event, order);
+            } else {
+                order.setAdress(loggedInPerson.getAddress());
+                order.setCustomerId(loggedInPerson.getId());
+                order.setEmail(loggedInPerson.getEmail());
+                order.setName(loggedInPerson.getName());
+                order.setPhoneNumber(loggedInPerson.getPhone());
+
+                payHandler(event, order);
+            }
+            orderList.add(order);
         }
     }
 
@@ -779,6 +715,7 @@ public class FXMLDocumentController implements Initializable {
         searchButton.setDisable(false);
 
         int columnSize = catColumnsList.size();
+        columnSize--;
 
         column1Pane.setVisible(false);
         column2Pane.setVisible(false);
@@ -869,7 +806,7 @@ public class FXMLDocumentController implements Initializable {
     }
 
     @FXML
-    private void handlerClosePoogramButton(ActionEvent event) {
+    private void handlerCloseProgramButton(ActionEvent event) {
         Alert closeAlert = new Alert(Alert.AlertType.WARNING);
         closeAlert.setTitle("Do you want to close the program?");
         closeAlert.setContentText("Your data will not be saved. Are you sure you want to proceed");
@@ -910,7 +847,7 @@ public class FXMLDocumentController implements Initializable {
         listProperty.add("washingmachine");
         listProperty.add("radio");
         listProperty.add("tv");
-        listProperty.add("fridges");
+        listProperty.add("freezers");
         listProperty.add("laptops");
         categoryDrop.setItems(listProperty);
         categoryDropMan.setItems(listProperty);
@@ -919,7 +856,7 @@ public class FXMLDocumentController implements Initializable {
 
         productTable.getColumns().clear();
 
-        tabPane.getTabs().removeAll(orderHistTab, prodManTab); //employeeOrderTab,
+        tabPane.getTabs().removeAll(orderHistTab, prodManTab, employeeOrderTab);
         prodManCommitButton.setDisable(true);
 
         prodManView.getSelectionModel().selectedItemProperty().addListener((observable) -> {
@@ -941,9 +878,8 @@ public class FXMLDocumentController implements Initializable {
     }
 
     private void visitorBuyHandler(ActionEvent event, Order order) {
-            showVisitorBuy(((Node) event.getTarget()).getScene().getWindow(), order);
-        }
-    
+        showVisitorBuy(((Node) event.getTarget()).getScene().getWindow(), order);
+    }
 
     private void payHandler(ActionEvent event, Order order) throws SQLException {
         showDialog(((Node) event.getTarget()).getScene().getWindow(), order);
@@ -997,7 +933,7 @@ public class FXMLDocumentController implements Initializable {
             if (!order.isIsPaid()) {
                 String msg = "You didnt pay for the order";
                 createModal(msg, Alert.AlertType.WARNING, true);
-               } else {
+            } else {
                 orderCon.insertOrder(order);
                 System.out.println(order.getOrderDate());
             }

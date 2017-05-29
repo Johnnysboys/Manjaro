@@ -87,7 +87,7 @@ public class ProductConnector extends SuperDB {
             pList = new ArrayList<Laptop>();
         } else if (category.equals("washingmachine")) {
             pList = new ArrayList<WashingMachine>();
-        } else if (category.equals("fridges")) {
+        } else if (category.equals("freezers")) {
             pList = new ArrayList<Fridge>();
         } else if (category.equals("tv")) {
             pList = new ArrayList<Tv>();
@@ -98,7 +98,6 @@ public class ProductConnector extends SuperDB {
         }
 
         StringBuilder sb = new StringBuilder();
-
         sb.append("SELECT * FROM ").append(category);
         sb.append(" WHERE ");
         sb.append("name ILIKE '%").append(name).append("%'");
@@ -121,7 +120,7 @@ public class ProductConnector extends SuperDB {
                 prod = new WashingMachine(rs.getInt("rpm"), rs.getDouble("capacity"), rs.getInt("noiselevel"), rs.getInt("energyusage"), rs.getInt("id"), rs.getString("name"), rs.getDouble("price"), rs.getString("description"));
                 WashingMachine wash = (WashingMachine) prod;
                 pList.add(wash);
-            } else if (category.equals("fridges")) {
+            } else if (category.equals("freezers")) {
                 prod = new Fridge(rs.getDouble("volume"), rs.getInt("shelf"), rs.getInt("noiselevel"), rs.getInt("energyusage"), rs.getInt("id"), rs.getString("name"), rs.getDouble("price"), rs.getString("description"));
                 Fridge fridge = (Fridge) prod;
                 pList.add(fridge);
@@ -148,7 +147,7 @@ public class ProductConnector extends SuperDB {
             pList = new ArrayList<Laptop>();
         } else if (category.equals("washingmachine")) {
             pList = new ArrayList<WashingMachine>();
-        } else if (category.equals("fridges")) {
+        } else if (category.equals("freezers")) {
             pList = new ArrayList<Fridge>();
         } else if (category.equals("tv")) {
             pList = new ArrayList<Tv>();
@@ -158,6 +157,7 @@ public class ProductConnector extends SuperDB {
             pList = new ArrayList<Product>();
         }
         int cSize = columns.size();
+        cSize--;
 
         ArrayList<String> colList = new ArrayList();
 
@@ -229,7 +229,7 @@ public class ProductConnector extends SuperDB {
                 prod = new WashingMachine(rs.getInt("rpm"), rs.getDouble("capacity"), rs.getInt("noiselevel"), rs.getInt("energyusage"), rs.getInt("id"), rs.getString("name"), rs.getDouble("price"), rs.getString("description"));
                 WashingMachine wash = (WashingMachine) prod;
                 pList.add(wash);
-            } else if (category.equals("fridges")) {
+            } else if (category.equals("freezers")) {
                 prod = new Fridge(rs.getDouble("volume"), rs.getInt("shelf"), rs.getInt("noiselevel"), rs.getInt("energyusage"), rs.getInt("id"), rs.getString("name"), rs.getDouble("price"), rs.getString("description"));
                 Fridge fridge = (Fridge) prod;
                 pList.add(fridge);

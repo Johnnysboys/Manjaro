@@ -142,12 +142,6 @@
                           </columns>
                         </TableView>
                         <Button fx:id="showOrderButton" layoutX="14.0" layoutY="408.0" mnemonicParsing="false" onAction="#showOrderHistory" text="Show Orders" />
-                        <TableView fx:id="orderProdView" layoutX="486.0" layoutY="14.0" prefHeight="239.0" prefWidth="279.0">
-                          <columns>
-                            <TableColumn prefWidth="75.0" text="C1" />
-                            <TableColumn prefWidth="75.0" text="C2" />
-                          </columns>
-                        </TableView>
                      </children>
                   </AnchorPane>
               </content>
@@ -157,12 +151,6 @@
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
                         <TableView fx:id="empOrderView" layoutX="14.0" layoutY="14.0" prefHeight="385.0" prefWidth="529.0">
-                          <columns>
-                            <TableColumn prefWidth="75.0" text="C1" />
-                            <TableColumn prefWidth="75.0" text="C2" />
-                          </columns>
-                        </TableView>
-                        <TableView fx:id="empOrderProdView" layoutX="567.0" layoutY="14.0" prefHeight="285.0" prefWidth="355.0">
                           <columns>
                             <TableColumn prefWidth="75.0" text="C1" />
                             <TableColumn prefWidth="75.0" text="C2" />
@@ -198,7 +186,7 @@
             <Label fx:id="userInfoLabel" layoutX="122.0" layoutY="27.0" text="setEmailHere + (SecurityLevel)" />
          </children>
       </Pane>
-    <Button layoutX="953.0" layoutY="709.0" mnemonicParsing="false" onAction="#handlerClosePoogramButton" text="Close program" />
+    <Button layoutX="953.0" layoutY="709.0" mnemonicParsing="false" onAction="#handlerCloseProgramButton" text="Close program" />
     <Button layoutX="866.0" layoutY="709.0" mnemonicParsing="false" onAction="#handlerHowToButton" text="How to?" />
    </children>
 </AnchorPane>

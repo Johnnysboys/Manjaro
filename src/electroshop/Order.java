@@ -3,7 +3,9 @@ package electroshop;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import products.Product;
@@ -13,7 +15,7 @@ import products.Product;
  * @author Troels
  */
 public class Order {
-    
+
     private int orderID;
     private Date orderDate;
     private HashMap<Product, Integer> productMap = new HashMap<>();
@@ -33,31 +35,49 @@ public class Order {
         this.lastName = lastName;
     }
     private String adress;
-    
-     public Order(int customerId, double priceTotal, boolean isPaid) {
+
+    public Order(int customerId, double priceTotal, boolean isPaid) {
         this.customerId = customerId;
         this.orderDate = new Date();
         this.priceTotal = priceTotal;
         this.isPaid = isPaid;
     }
-     
-     public Order(int orderId, double priceTotal, boolean isPaid, long date) {
+
+    public Order(int orderId, double priceTotal, boolean isPaid, long date) {
         this.orderID = orderId;
         this.orderDate = new Date(date);
         this.priceTotal = priceTotal;
         this.isPaid = isPaid;
     }
-     
+
     public Order(Basket basket) {
         this.productMap = basket.getProductMap();
         this.priceTotal = basket.getTotal();
         this.orderDate = new Date();
     }
-    
+
     public Order(Basket basket, int orderID) {
         this.productMap = basket.getProductMap();
         this.priceTotal = basket.getTotal();
         this.orderID = orderID;
+    }
+
+    public double getCalcTotal() {
+        double total = 0;
+
+        Set<Product> keySet = productMap.keySet();
+        Iterator<Product> keyIterator = keySet.iterator();
+
+        while (keyIterator.hasNext()) {
+            Product product = keyIterator.next();
+            int currentValue = productMap.get(product);
+
+            total = total + (product.getPrice() * currentValue);
+            System.out.println(total);
+
+        }
+
+        return total;
     }
 
     public int getOrderID() {
@@ -75,8 +95,8 @@ public class Order {
     public void setOrderDate(Date orderDate) {
         this.orderDate = orderDate;
     }
-    
-    public void addProduct(Product product, int amount){
+
+    public void addProduct(Product product, int amount) {
         productMap.put(product, amount);
     }
 
@@ -143,15 +163,14 @@ public class Order {
     public void setIsPaid(boolean isPaid) {
         this.isPaid = isPaid;
     }
-    
-    public ObservableList<Product> getKeySet(){
+
+    public ObservableList<Product> getKeySet() {
         List<Product> keys = new ArrayList<>(productMap.keySet());
-        
+
         ObservableList<Product> keyList = FXCollections.observableArrayList(keys);
-        
+
         return keyList;
-        
+
     }
-    
-    
+
 }

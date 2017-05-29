@@ -56,8 +56,10 @@ public class Basket {
     }
 
     /**
-     * Iterates through the basket, and returns a double with the total price of all products.
-     * @return - A double containing the price for the entire basket. 
+     * Iterates through the basket, and returns a double with the total price of
+     * all products.
+     *
+     * @return - A double containing the price for the entire basket.
      */
     public double getTotal() {
         double total = 0;
@@ -68,7 +70,10 @@ public class Basket {
         while (keyIterator.hasNext()) {
             Product product = keyIterator.next();
             int currentValue = productMap.get(product);
+
             total = total + (product.getPrice() * currentValue);
+            System.out.println(total);
+
         }
 
         return total;
