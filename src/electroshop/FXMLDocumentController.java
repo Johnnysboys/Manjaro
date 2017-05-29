@@ -208,6 +208,8 @@ public class FXMLDocumentController implements Initializable {
     private TextArea prodManArea;
     @FXML
     private Button prodManCommitButton;
+    
+    private WebShopMediator mediator;
 
     @FXML
     private void handleBasketUpdate(ActionEvent event) {
@@ -300,7 +302,6 @@ public class FXMLDocumentController implements Initializable {
         int id = prodManView.getSelectionModel().getSelectedItem().getProductId();
         System.out.println(id);
         String newDesc = prodManArea.getText();
-        //System.out.println(prodManView.getSelectionModel().getSelectedItem().getProductId());
 
         System.out.println(newDesc);
         prodCon.changeProductDesc(id, newDesc);
@@ -333,13 +334,13 @@ public class FXMLDocumentController implements Initializable {
 
                 prodManView.getColumns().addAll(c1, c2, c4, c5, c6, c7, c8);
 
-                c1.setCellValueFactory(new PropertyValueFactory<Product, String>("productName"));
-                c2.setCellValueFactory(new PropertyValueFactory<Product, String>("price"));
-                c4.setCellValueFactory(new PropertyValueFactory<Product, String>("processor"));
-                c5.setCellValueFactory(new PropertyValueFactory<Product, String>("ram"));
-                c6.setCellValueFactory(new PropertyValueFactory<Product, String>("harddrivesSize"));
-                c7.setCellValueFactory(new PropertyValueFactory<Product, String>("formfactor"));
-                c8.setCellValueFactory(new PropertyValueFactory<Product, String>("integratedWifi"));
+                c1.setCellValueFactory(new PropertyValueFactory<>("productName"));
+                c2.setCellValueFactory(new PropertyValueFactory<>("price"));
+                c4.setCellValueFactory(new PropertyValueFactory<>("processor"));
+                c5.setCellValueFactory(new PropertyValueFactory<>("ram"));
+                c6.setCellValueFactory(new PropertyValueFactory<>("harddrivesSize"));
+                c7.setCellValueFactory(new PropertyValueFactory<>("formfactor"));
+                c8.setCellValueFactory(new PropertyValueFactory<>("integratedWifi"));
                 break;
             }
             case "washingmachine": {
@@ -351,12 +352,12 @@ public class FXMLDocumentController implements Initializable {
                 TableColumn c7 = new TableColumn(columns.get(7));
 
                 prodManView.getColumns().addAll(c1, c2, c4, c5, c6, c7);
-                c1.setCellValueFactory(new PropertyValueFactory<Product, String>("productName"));
-                c2.setCellValueFactory(new PropertyValueFactory<Product, String>("price"));
-                c4.setCellValueFactory(new PropertyValueFactory<Product, String>("noiseLevel"));
-                c5.setCellValueFactory(new PropertyValueFactory<Product, String>("energyUsage"));
-                c6.setCellValueFactory(new PropertyValueFactory<Product, String>("rpm"));
-                c7.setCellValueFactory(new PropertyValueFactory<Product, String>("capacity"));
+                c1.setCellValueFactory(new PropertyValueFactory<>("productName"));
+                c2.setCellValueFactory(new PropertyValueFactory<>("price"));
+                c4.setCellValueFactory(new PropertyValueFactory<>("noiseLevel"));
+                c5.setCellValueFactory(new PropertyValueFactory<>("energyUsage"));
+                c6.setCellValueFactory(new PropertyValueFactory<>("rpm"));
+                c7.setCellValueFactory(new PropertyValueFactory<>("capacity"));
                 break;
             }
             case "fridges": {
@@ -368,12 +369,12 @@ public class FXMLDocumentController implements Initializable {
                 TableColumn c7 = new TableColumn(columns.get(7));
 
                 prodManView.getColumns().addAll(c1, c2, c4, c5, c6, c7);
-                c1.setCellValueFactory(new PropertyValueFactory<Product, String>("productName"));
-                c2.setCellValueFactory(new PropertyValueFactory<Product, String>("price"));
-                c4.setCellValueFactory(new PropertyValueFactory<Product, String>("noiseLevel"));
-                c5.setCellValueFactory(new PropertyValueFactory<Product, String>("energyUsage"));
-                c6.setCellValueFactory(new PropertyValueFactory<Product, String>("volume"));
-                c7.setCellValueFactory(new PropertyValueFactory<Product, String>("shelfs"));
+                c1.setCellValueFactory(new PropertyValueFactory<>("productName"));
+                c2.setCellValueFactory(new PropertyValueFactory<>("price"));
+                c4.setCellValueFactory(new PropertyValueFactory<>("noiseLevel"));
+                c5.setCellValueFactory(new PropertyValueFactory<>("energyUsage"));
+                c6.setCellValueFactory(new PropertyValueFactory<>("volume"));
+                c7.setCellValueFactory(new PropertyValueFactory<>("shelfs"));
                 break;
             }
             case "tv": {
@@ -386,13 +387,13 @@ public class FXMLDocumentController implements Initializable {
                 TableColumn c8 = new TableColumn(columns.get(8));
 
                 prodManView.getColumns().addAll(c1, c2, c4, c5, c6, c7, c8);
-                c1.setCellValueFactory(new PropertyValueFactory<Product, String>("productName"));
-                c2.setCellValueFactory(new PropertyValueFactory<Product, String>("price"));
-                c4.setCellValueFactory(new PropertyValueFactory<Product, String>("soundLevel"));
-                c5.setCellValueFactory(new PropertyValueFactory<Product, String>("color"));
-                c6.setCellValueFactory(new PropertyValueFactory<Product, String>("screenSize"));
-                c7.setCellValueFactory(new PropertyValueFactory<Product, String>("resolution"));
-                c8.setCellValueFactory(new PropertyValueFactory<Product, String>("panelType"));
+                c1.setCellValueFactory(new PropertyValueFactory<>("productName"));
+                c2.setCellValueFactory(new PropertyValueFactory<>("price"));
+                c4.setCellValueFactory(new PropertyValueFactory<>("soundLevel"));
+                c5.setCellValueFactory(new PropertyValueFactory<>("color"));
+                c6.setCellValueFactory(new PropertyValueFactory<>("screenSize"));
+                c7.setCellValueFactory(new PropertyValueFactory<>("resolution"));
+                c8.setCellValueFactory(new PropertyValueFactory<>("panelType"));
                 break;
             }
             case "radio": {
@@ -404,12 +405,12 @@ public class FXMLDocumentController implements Initializable {
                 TableColumn c7 = new TableColumn(columns.get(7));
 
                 prodManView.getColumns().addAll(c1, c2, c4, c5, c6, c7);
-                c1.setCellValueFactory(new PropertyValueFactory<Product, String>("productName"));
-                c2.setCellValueFactory(new PropertyValueFactory<Product, String>("price"));
-                c4.setCellValueFactory(new PropertyValueFactory<Product, String>("soundLevel"));
-                c5.setCellValueFactory(new PropertyValueFactory<Product, String>("color"));
-                c6.setCellValueFactory(new PropertyValueFactory<Product, String>("batteryLife"));
-                c7.setCellValueFactory(new PropertyValueFactory<Product, String>("effect"));
+                c1.setCellValueFactory(new PropertyValueFactory<>("productName"));
+                c2.setCellValueFactory(new PropertyValueFactory<>("price"));
+                c4.setCellValueFactory(new PropertyValueFactory<>("soundLevel"));
+                c5.setCellValueFactory(new PropertyValueFactory<>("color"));
+                c6.setCellValueFactory(new PropertyValueFactory<>("batteryLife"));
+                c7.setCellValueFactory(new PropertyValueFactory<>("effect"));
                 break;
             }
             case "laptops": {
@@ -423,14 +424,14 @@ public class FXMLDocumentController implements Initializable {
                 TableColumn c9 = new TableColumn(columns.get(9));
 
                 prodManView.getColumns().addAll(c1, c2, c4, c5, c6, c7, c8, c9);
-                c1.setCellValueFactory(new PropertyValueFactory<Product, String>("productName"));
-                c2.setCellValueFactory(new PropertyValueFactory<Product, String>("price"));
-                c4.setCellValueFactory(new PropertyValueFactory<Product, String>("processor"));
-                c5.setCellValueFactory(new PropertyValueFactory<Product, String>("ram"));
-                c6.setCellValueFactory(new PropertyValueFactory<Product, String>("harddrivesSize"));
-                c7.setCellValueFactory(new PropertyValueFactory<Product, String>("screenSize"));
-                c8.setCellValueFactory(new PropertyValueFactory<Product, String>("weight"));
-                c9.setCellValueFactory(new PropertyValueFactory<Product, String>("batteryLife"));
+                c1.setCellValueFactory(new PropertyValueFactory<>("productName"));
+                c2.setCellValueFactory(new PropertyValueFactory<>("price"));
+                c4.setCellValueFactory(new PropertyValueFactory<>("processor"));
+                c5.setCellValueFactory(new PropertyValueFactory<>("ram"));
+                c6.setCellValueFactory(new PropertyValueFactory<>("harddrivesSize"));
+                c7.setCellValueFactory(new PropertyValueFactory<>("screenSize"));
+                c8.setCellValueFactory(new PropertyValueFactory<>("weight"));
+                c9.setCellValueFactory(new PropertyValueFactory<>("batteryLife"));
                 break;
             }
             default:
@@ -444,14 +445,14 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private void searchProducts(ActionEvent event) throws SQLException {
         String category = (String) categoryDrop.getValue();
-        String name = nameField.getText();
-        String price = priceField.getText();
-        String col1 = column1Field.getText();
-        String col2 = column2Field.getText();
-        String col3 = column3Field.getText();
-        String col4 = column4Field.getText();
-        String col5 = column5Field.getText();
-        String col6 = column6Field.getText();
+        String name     = nameField.getText();
+        String price    = priceField.getText();
+        String col1     = column1Field.getText();
+        String col2     = column2Field.getText();
+        String col3     = column3Field.getText();
+        String col4     = column4Field.getText();
+        String col5     = column5Field.getText();
+        String col6     = column6Field.getText();
 
         prodSearch = FXCollections.observableArrayList(prodCon.findProducts(category, catColumnsList, name, price, col1, col2, col3, col4, col5, col6));
         if (prodSearch == null) {
@@ -462,7 +463,6 @@ public class FXMLDocumentController implements Initializable {
 
         productTable.setEditable(true);
         int columnAmount = catColumnsList.size();
-        System.out.println(columnAmount);
         productTable.getColumns().clear();
 
         switch (category) {
@@ -477,13 +477,13 @@ public class FXMLDocumentController implements Initializable {
 
                 productTable.getColumns().addAll(c1, c2, c4, c5, c6, c7, c8);
 
-                c1.setCellValueFactory(new PropertyValueFactory<Product, String>("productName"));
-                c2.setCellValueFactory(new PropertyValueFactory<Product, String>("price"));
-                c4.setCellValueFactory(new PropertyValueFactory<Product, String>("processor"));
-                c5.setCellValueFactory(new PropertyValueFactory<Product, String>("ram"));
-                c6.setCellValueFactory(new PropertyValueFactory<Product, String>("harddrivesSize"));
-                c7.setCellValueFactory(new PropertyValueFactory<Product, String>("formfactor"));
-                c8.setCellValueFactory(new PropertyValueFactory<Product, String>("integratedWifi"));
+                c1.setCellValueFactory(new PropertyValueFactory<>("productName"));
+                c2.setCellValueFactory(new PropertyValueFactory<>("price"));
+                c4.setCellValueFactory(new PropertyValueFactory<>("processor"));
+                c5.setCellValueFactory(new PropertyValueFactory<>("ram"));
+                c6.setCellValueFactory(new PropertyValueFactory<>("harddrivesSize"));
+                c7.setCellValueFactory(new PropertyValueFactory<>("formfactor"));
+                c8.setCellValueFactory(new PropertyValueFactory<>("integratedWifi"));
                 break;
             }
             case "washingmachine": {
@@ -495,12 +495,12 @@ public class FXMLDocumentController implements Initializable {
                 TableColumn c7 = new TableColumn(catColumnsList.get(7));
 
                 productTable.getColumns().addAll(c1, c2, c4, c5, c6, c7);
-                c1.setCellValueFactory(new PropertyValueFactory<Product, String>("productName"));
-                c2.setCellValueFactory(new PropertyValueFactory<Product, String>("price"));
-                c4.setCellValueFactory(new PropertyValueFactory<Product, String>("noiseLevel"));
-                c5.setCellValueFactory(new PropertyValueFactory<Product, String>("energyUsage"));
-                c6.setCellValueFactory(new PropertyValueFactory<Product, String>("rpm"));
-                c7.setCellValueFactory(new PropertyValueFactory<Product, String>("capacity"));
+                c1.setCellValueFactory(new PropertyValueFactory<>("productName"));
+                c2.setCellValueFactory(new PropertyValueFactory<>("price"));
+                c4.setCellValueFactory(new PropertyValueFactory<>("noiseLevel"));
+                c5.setCellValueFactory(new PropertyValueFactory<>("energyUsage"));
+                c6.setCellValueFactory(new PropertyValueFactory<>("rpm"));
+                c7.setCellValueFactory(new PropertyValueFactory<>("capacity"));
                 break;
             }
             case "fridges": {
@@ -512,12 +512,12 @@ public class FXMLDocumentController implements Initializable {
                 TableColumn c7 = new TableColumn(catColumnsList.get(7));
 
                 productTable.getColumns().addAll(c1, c2, c4, c5, c6, c7);
-                c1.setCellValueFactory(new PropertyValueFactory<Product, String>("productName"));
-                c2.setCellValueFactory(new PropertyValueFactory<Product, String>("price"));
-                c4.setCellValueFactory(new PropertyValueFactory<Product, String>("noiseLevel"));
-                c5.setCellValueFactory(new PropertyValueFactory<Product, String>("energyUsage"));
-                c6.setCellValueFactory(new PropertyValueFactory<Product, String>("volume"));
-                c7.setCellValueFactory(new PropertyValueFactory<Product, String>("shelfs"));
+                c1.setCellValueFactory(new PropertyValueFactory<>("productName"));
+                c2.setCellValueFactory(new PropertyValueFactory<>("price"));
+                c4.setCellValueFactory(new PropertyValueFactory<>("noiseLevel"));
+                c5.setCellValueFactory(new PropertyValueFactory<>("energyUsage"));
+                c6.setCellValueFactory(new PropertyValueFactory<>("volume"));
+                c7.setCellValueFactory(new PropertyValueFactory<>("shelfs"));
                 break;
             }
             case "tv": {
@@ -530,13 +530,13 @@ public class FXMLDocumentController implements Initializable {
                 TableColumn c8 = new TableColumn(catColumnsList.get(8));
 
                 productTable.getColumns().addAll(c1, c2, c4, c5, c6, c7, c8);
-                c1.setCellValueFactory(new PropertyValueFactory<Product, String>("productName"));
-                c2.setCellValueFactory(new PropertyValueFactory<Product, String>("price"));
-                c4.setCellValueFactory(new PropertyValueFactory<Product, String>("soundLevel"));
-                c5.setCellValueFactory(new PropertyValueFactory<Product, String>("color"));
-                c6.setCellValueFactory(new PropertyValueFactory<Product, String>("screenSize"));
-                c7.setCellValueFactory(new PropertyValueFactory<Product, String>("resolution"));
-                c8.setCellValueFactory(new PropertyValueFactory<Product, String>("panelType"));
+                c1.setCellValueFactory(new PropertyValueFactory<>("productName"));
+                c2.setCellValueFactory(new PropertyValueFactory<>("price"));
+                c4.setCellValueFactory(new PropertyValueFactory<>("soundLevel"));
+                c5.setCellValueFactory(new PropertyValueFactory<>("color"));
+                c6.setCellValueFactory(new PropertyValueFactory<>("screenSize"));
+                c7.setCellValueFactory(new PropertyValueFactory<>("resolution"));
+                c8.setCellValueFactory(new PropertyValueFactory<>("panelType"));
                 break;
             }
             case "radio": {
@@ -548,12 +548,12 @@ public class FXMLDocumentController implements Initializable {
                 TableColumn c7 = new TableColumn(catColumnsList.get(7));
 
                 productTable.getColumns().addAll(c1, c2, c4, c5, c6, c7);
-                c1.setCellValueFactory(new PropertyValueFactory<Product, String>("productName"));
-                c2.setCellValueFactory(new PropertyValueFactory<Product, String>("price"));
-                c4.setCellValueFactory(new PropertyValueFactory<Product, String>("soundLevel"));
-                c5.setCellValueFactory(new PropertyValueFactory<Product, String>("color"));
-                c6.setCellValueFactory(new PropertyValueFactory<Product, String>("batteryLife"));
-                c7.setCellValueFactory(new PropertyValueFactory<Product, String>("effect"));
+                c1.setCellValueFactory(new PropertyValueFactory<>("productName"));
+                c2.setCellValueFactory(new PropertyValueFactory<>("price"));
+                c4.setCellValueFactory(new PropertyValueFactory<>("soundLevel"));
+                c5.setCellValueFactory(new PropertyValueFactory<>("color"));
+                c6.setCellValueFactory(new PropertyValueFactory<>("batteryLife"));
+                c7.setCellValueFactory(new PropertyValueFactory<>("effect"));
                 break;
             }
             case "laptops": {
@@ -567,14 +567,14 @@ public class FXMLDocumentController implements Initializable {
                 TableColumn c9 = new TableColumn(catColumnsList.get(9));
 
                 productTable.getColumns().addAll(c1, c2, c4, c5, c6, c7, c8, c9);
-                c1.setCellValueFactory(new PropertyValueFactory<Product, String>("productName"));
-                c2.setCellValueFactory(new PropertyValueFactory<Product, String>("price"));
-                c4.setCellValueFactory(new PropertyValueFactory<Product, String>("processor"));
-                c5.setCellValueFactory(new PropertyValueFactory<Product, String>("ram"));
-                c6.setCellValueFactory(new PropertyValueFactory<Product, String>("harddrivesSize"));
-                c7.setCellValueFactory(new PropertyValueFactory<Product, String>("screenSize"));
-                c8.setCellValueFactory(new PropertyValueFactory<Product, String>("weight"));
-                c9.setCellValueFactory(new PropertyValueFactory<Product, String>("batteryLife"));
+                c1.setCellValueFactory(new PropertyValueFactory<>("productName"));
+                c2.setCellValueFactory(new PropertyValueFactory<>("price"));
+                c4.setCellValueFactory(new PropertyValueFactory<>("processor"));
+                c5.setCellValueFactory(new PropertyValueFactory<>("ram"));
+                c6.setCellValueFactory(new PropertyValueFactory<>("harddrivesSize"));
+                c7.setCellValueFactory(new PropertyValueFactory<>("screenSize"));
+                c8.setCellValueFactory(new PropertyValueFactory<>("weight"));
+                c9.setCellValueFactory(new PropertyValueFactory<>("batteryLife"));
                 break;
             }
             default:
@@ -622,7 +622,6 @@ public class FXMLDocumentController implements Initializable {
         //Row Hover Mechanic
         productTable.setRowFactory(tableView -> {
             final TableRow<Product> row = new TableRow<>();
-
             row.hoverProperty().addListener((observable) -> {
                 final Product product = row.getItem();
                 productDescArea.clear();
@@ -641,30 +640,21 @@ public class FXMLDocumentController implements Initializable {
 
     @FXML
     private void searchForOrders() throws SQLException {
-
         String searchCriteria = empOrderSearchField.getText();
-
         if (searchCriteria.equals("")) {
             return;
         } else {
-            System.out.println(searchCriteria);
             empOrderList = orderCon.getOrderOverview(searchCriteria); 
-
             empOrderView.getColumns().clear();
             TableColumn orderNumber = new TableColumn("Order ID");
             TableColumn orderPrice = new TableColumn("Price Total");
             TableColumn orderDate = new TableColumn("Date");
-
             orderNumber.setCellValueFactory(new PropertyValueFactory<>("orderID"));
             orderPrice.setCellValueFactory(new PropertyValueFactory("priceTotal"));
             orderDate.setCellValueFactory(new PropertyValueFactory("orderDate"));
-
             empOrderView.getColumns().addAll(orderNumber, orderPrice, orderDate);
-
             empOrderView.setItems(empOrderList);
-
         }
-
     }
 
     @FXML
@@ -698,7 +688,8 @@ public class FXMLDocumentController implements Initializable {
             return row;
         });
 
-        orderView.setItems(orderList);
+        ObservableList<Order> orders = FXCollections.observableArrayList(this.mediator.getOrders(loggedInPerson.getEmail()));
+        orderView.setItems(orders);
 
     }
 
@@ -974,22 +965,25 @@ public class FXMLDocumentController implements Initializable {
         }
     }
 
+    /*
+    
+    */
     private void showDialog(Window parent, Order order) throws SQLException {
-        boolean answer = false;
-        Parent root;
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("PaypalDialog.fxml"));
-            root = loader.load();
+            Parent root = loader.load();
+            // Get the paypal controller
             PaypalDialogController paypalDialogController = loader.getController();
             Scene scene = new Scene(root);
             Stage dialog = new Stage();
 
-            // Debug value
             paypalDialogController.setVariables(dialog, order);
-
+            // Show paypal window and set parent to the current window.
             dialog.initOwner(parent);
             dialog.initModality(Modality.WINDOW_MODAL);
             dialog.setScene(scene);
+            
+            // Show the window and wait, until user is finished
             dialog.showAndWait();
 
             order = paypalDialogController.getOrder();
@@ -999,9 +993,7 @@ public class FXMLDocumentController implements Initializable {
                 createModal(msg, Alert.AlertType.WARNING, true);
                } else {
                 orderCon.insertOrder(order);
-                System.out.println(order.getOrderDate());
             }
-
         } catch (IOException ex) {
             Logger.getLogger(FXMLDocumentController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -1036,6 +1028,10 @@ public class FXMLDocumentController implements Initializable {
             alert.initModality(Modality.APPLICATION_MODAL);
         }
         alert.showAndWait();
+    }
+
+    void injectMediator(WebShopMediator mediator) {
+        this.mediator = mediator;
     }
 
 }

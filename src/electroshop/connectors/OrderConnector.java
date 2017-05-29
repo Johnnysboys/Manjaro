@@ -10,6 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Map;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -65,6 +66,46 @@ public class OrderConnector extends SuperDB {
         }
         return orderOverview;
     }
+    public ArrayList<Order> getOrderOverviewList(String email) throws SQLException {
+        ArrayList<Order> orderOverview = new ArrayList<>();
+        String query = "SELECT orders.orderdate, orders.customerid, orderlines.*, products.name, products.description, products.price, products.producttype FROM orders\n"
+                + "JOIN accounts ON accounts.id = orders.customerID \n"
+                + "JOIN orderlines ON orders.orderID = orderlines.orderID\n"
+                + "JOIN products ON orderlines.productid = products.id\n"
+                + "WHERE accounts.email = ?;";
+
+        PreparedStatement ps = this.getCon().prepareStatement(query);
+        ps.setString(1, email);
+        ResultSet rs = ps.executeQuery();
+        int checkingId = -1;
+        Order currentOrder = null;
+        Product product = null;
+        while (rs.next()) {
+            product = new GenericProducts(rs.getInt("productid"), rs.getString("name"), rs.getDouble("price"), rs.getString("description"));
+            if (checkingId != rs.getInt("orderid")) {
+                if (!rs.isFirst()) {
+                    orderOverview.add(currentOrder);
+                }
+                System.out.println("New Order");
+                currentOrder = new Order(rs.getInt("orderid"), rs.getDouble("price"), false, rs.getLong("orderdate"));
+                checkingId = rs.getInt("orderid");
+            }
+            System.out.println(rs.toString());
+            System.out.println(rs.getString("name"));
+
+            if (currentOrder != null && product != null) {
+                currentOrder.addProduct(product, rs.getInt("amount"));
+            } else {
+                System.out.println("Current Order is null!");
+            }
+            if (rs.isLast()) {
+                orderOverview.add(currentOrder);
+            }
+
+        }
+        this.closeConnection();
+        return orderOverview;
+    }
 
     public boolean insertOrder(Order order) throws SQLException {
         String orderLineQuery = "insert into orderlines (orderid, productid, amount, price) VALUES (?,?,?,?)";
@@ -95,6 +136,7 @@ public class OrderConnector extends SuperDB {
         }
         orderLineStatement.executeBatch();
         orderLineStatement.close();
+        this.closeConnection();
         return true;
     }
 

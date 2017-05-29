@@ -35,7 +35,11 @@ public abstract class SuperDB {
 
     }
     
+    
     public Connection getCon(){
         return this.con;
+    }
+    public void closeConnection() throws SQLException{
+        this.con.close();
     }
 }

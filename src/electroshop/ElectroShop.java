@@ -17,15 +17,10 @@ import javafx.stage.Stage;
  * @author Jakob
  */
 public class ElectroShop extends Application {
-    
+    WebShopMediator mainProgram = new WebShopMediator();
     @Override
     public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("FXMLDocument.fxml"));
-        
-        Scene scene = new Scene(root);
-        
-        stage.setScene(scene);
-        stage.show();
+        mainProgram.startMain(stage);
     }
 
     /**
