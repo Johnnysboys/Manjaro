@@ -72,7 +72,6 @@ public class Basket {
             int currentValue = productMap.get(product);
 
             total = total + (product.getPrice() * currentValue);
-            System.out.println(total);
 
         }
 

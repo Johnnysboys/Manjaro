@@ -46,12 +46,9 @@ public class OrderConnector extends SuperDB {
                 if (!rs.isFirst()) {
                     orderOverview.add(currentOrder);
                 }
-                System.out.println("New Order");
                 currentOrder = new Order(rs.getInt("orderid"), rs.getDouble("price"), false, rs.getLong("orderdate"));
                 checkingId = rs.getInt("orderid");
             }
-            System.out.println(rs.toString());
-            System.out.println(rs.getString("name"));
 
             if (currentOrder != null && product != null) {
                 currentOrder.addProduct(product, rs.getInt("amount"));

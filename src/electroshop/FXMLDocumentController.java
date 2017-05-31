@@ -299,7 +299,6 @@ public class FXMLDocumentController implements Initializable {
         int id = prodManView.getSelectionModel().getSelectedItem().getProductId();
         String newDesc = prodManArea.getText();
         prodCon.changeProductDesc(id, newDesc);
-        System.out.println("");
         prodManArea.clear();
         prodManCommitButton.setDisable(true);
         this.prodManSearchHandle(event);
@@ -458,8 +457,6 @@ public class FXMLDocumentController implements Initializable {
         int columnAmount = catColumnsList.size();
         columnAmount--;
         productTable.getColumns().clear();
-        System.out.println(category);
-        System.out.println(catColumnsList.toString());
         switch (category) {
             case "desktops": {
                 TableColumn c1 = new TableColumn(catColumnsList.get(1));
@@ -505,7 +502,6 @@ public class FXMLDocumentController implements Initializable {
                 TableColumn c5 = new TableColumn(catColumnsList.get(5));
                 TableColumn c6 = new TableColumn(catColumnsList.get(6));
                 TableColumn c7 = new TableColumn(catColumnsList.get(7));
-                System.out.println("in freeze");
                 productTable.getColumns().addAll(c1, c2, c4, c5, c6, c7);
                 c1.setCellValueFactory(new PropertyValueFactory<Product, String>("productName"));
                 c2.setCellValueFactory(new PropertyValueFactory<Product, String>("price"));
@@ -642,7 +638,6 @@ public class FXMLDocumentController implements Initializable {
         if (searchCriteria.equals("")) {
             return;
         } else {
-            System.out.println(searchCriteria);
             empOrderList = orderCon.getOrderOverview(searchCriteria);
 
             empOrderView.getColumns().clear();
@@ -935,7 +930,6 @@ public class FXMLDocumentController implements Initializable {
                 createModal(msg, Alert.AlertType.WARNING, true);
             } else {
                 orderCon.insertOrder(order);
-                System.out.println(order.getOrderDate());
             }
 
         } catch (IOException ex) {
