@@ -68,7 +68,7 @@ public class AccountsConnector extends SuperDB {
 
         Boolean exists = this.accountExists(email);
 
-        if (exists == true) {
+        if (exists) {
             System.out.println("an account with this email already exists");
         } else {
             String addString = "insert into accounts (email, name, phone, address, pw, sec) VALUES (?, ?, ?, ?, ?, ?)";
@@ -88,15 +88,9 @@ public class AccountsConnector extends SuperDB {
     public Boolean accountExists(String email) throws SQLException {
         String search = "SELECT email FROM accounts WHERE email = ?;";
         PreparedStatement search2 = this.getCon().prepareStatement(search);
-
         search2.setString(1, email);
         ResultSet rs = search2.executeQuery();
-        if (rs.next() == true) {
-            return true;
-        } else {
-            return false;
-        }
-
+        // Returns true if the account exists
+        return rs.next();
     }
-
 }

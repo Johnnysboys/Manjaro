@@ -29,7 +29,8 @@ public class OrderConnector extends SuperDB {
     public ObservableList<Order> getOrderOverview(String email) throws SQLException {
         ObservableList<Order> orderOverview = FXCollections.observableArrayList();
         String query = "SELECT orders.orderdate, orders.customerid, orderlines.*, "
-                + "products.name, products.description, products.price, products.producttype FROM orders\n"
+                + "products.name, products.description, products.price,"
+                + "products.producttype FROM orders\n"
                 + "JOIN accounts ON accounts.id = orders.customerID \n"
                 + "JOIN orderlines ON orders.orderID = orderlines.orderID\n"
                 + "JOIN products ON orderlines.productid = products.id\n"
@@ -38,31 +39,31 @@ public class OrderConnector extends SuperDB {
         PreparedStatement ps = this.getCon().prepareStatement(query);
         ps.setString(1, email);
         ResultSet rs = ps.executeQuery();
+        // Temp int to keep track of which order we are looking at
         int checkingId = -1;
         Order currentOrder = null;
-        Product product = null;
         while (rs.next()) {
-            product = new GenericProducts(rs.getInt("productid"), rs.getString("name"), rs.getDouble("price"), rs.getString("description"));
+            Product product = new GenericProducts(rs.getInt("productid"), rs.getString("name"), rs.getDouble("price"), rs.getString("description"));
             if (checkingId != rs.getInt("orderid")) {
+                // Dont add the currentOrder to the list if it's the first tuple
                 if (!rs.isFirst()) {
                     orderOverview.add(currentOrder);
                 }
+                // Create a new order
                 currentOrder = new Order(rs.getInt("orderid"), rs.getDouble("price"), false, rs.getLong("orderdate"));
+                // Change the current order ID that we are using
                 checkingId = rs.getInt("orderid");
             }
-
-            if (currentOrder != null && product != null) {
+            if (currentOrder != null) {
                 currentOrder.addProduct(product, rs.getInt("amount"));
-            } else {
-                System.out.println("Current Order is null!");
             }
+            
             currentOrder.setPriceTotal(currentOrder.getCalcTotal());
+            // If it's the last tuple, add the currentOrder to the list
             if (rs.isLast()) {
                 orderOverview.add(currentOrder);
             }
-            
         }
-        
         return orderOverview;
     }
 
@@ -74,9 +75,8 @@ public class OrderConnector extends SuperDB {
         ps.setInt(2, order.getCustomerId());
         
         ResultSet rs = ps.executeQuery();
-        
+        // Move the pointer in the result set
         rs.next();
-        
         int orderId = rs.getInt("orderid");
         
         ps.close();
