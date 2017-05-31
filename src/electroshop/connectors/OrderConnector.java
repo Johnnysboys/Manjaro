@@ -28,7 +28,8 @@ public class OrderConnector extends SuperDB {
 
     public ObservableList<Order> getOrderOverview(String email) throws SQLException {
         ObservableList<Order> orderOverview = FXCollections.observableArrayList();
-        String query = "SELECT orders.orderdate, orders.customerid, orderlines.*, products.name, products.description, products.price, products.producttype FROM orders\n"
+        String query = "SELECT orders.orderdate, orders.customerid, orderlines.*, "
+                + "products.name, products.description, products.price, products.producttype FROM orders\n"
                 + "JOIN accounts ON accounts.id = orders.customerID \n"
                 + "JOIN orderlines ON orders.orderID = orderlines.orderID\n"
                 + "JOIN products ON orderlines.productid = products.id\n"
