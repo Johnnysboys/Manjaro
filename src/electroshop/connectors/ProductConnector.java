@@ -34,11 +34,11 @@ public class ProductConnector extends SuperDB {
 
     public ObservableList getCategories() throws SQLException {
 
-        ListProperty<String> listProperty = new SimpleListProperty<String>(FXCollections.<String>observableArrayList());
+        ListProperty<String> listProperty = new SimpleListProperty<>(FXCollections.<String>observableArrayList());
 
         String cat = "SELECT table_name\n"
-                + "  FROM information_schema.tables\n"
-                + " WHERE table_schema='public'\n"
+                + "   FROM information_schema.tables\n"
+                + "   WHERE table_schema='public'\n"
                 + "   AND table_type='BASE TABLE'\n"
                 + "   AND NOT table_name='accounts'\n"
                 + "   AND NOT table_name='products';";
@@ -81,20 +81,28 @@ public class ProductConnector extends SuperDB {
 
     public ArrayList findProductsByName(String category, String name) throws SQLException {
         ArrayList pList;
-        if (category.equals("desktops")) {
-            pList = new ArrayList<Desktop>();
-        } else if (category.equals("laptops")) {
-            pList = new ArrayList<Laptop>();
-        } else if (category.equals("washingmachine")) {
-            pList = new ArrayList<WashingMachine>();
-        } else if (category.equals("freezers")) {
-            pList = new ArrayList<Fridge>();
-        } else if (category.equals("tv")) {
-            pList = new ArrayList<Tv>();
-        } else if (category.equals("radio")) {
-            pList = new ArrayList<Radio>();
-        } else {
-            pList = new ArrayList<Product>();
+        switch (category) {
+            case "desktops":
+                pList = new ArrayList<Desktop>();
+                break;
+            case "laptops":
+                pList = new ArrayList<Laptop>();
+                break;
+            case "washingmachine":
+                pList = new ArrayList<WashingMachine>();
+                break;
+            case "freezers":
+                pList = new ArrayList<Fridge>();
+                break;
+            case "tv":
+                pList = new ArrayList<Tv>();
+                break;
+            case "radio":
+                pList = new ArrayList<Radio>();
+                break;
+            default:
+                pList = new ArrayList<Product>();
+                break;
         }
 
         StringBuilder sb = new StringBuilder();
@@ -108,30 +116,39 @@ public class ProductConnector extends SuperDB {
         int q = 0;
         while (rs.next() && q < 10) {
             Product prod = null;
-            if (category.equals("desktops")) {
-                prod = new Desktop(rs.getString("formfactor"), rs.getBoolean("integratedwifi"), rs.getDouble("processor"), rs.getInt("ram"), rs.getInt("harddrive"), rs.getInt("id"), rs.getString("name"), rs.getDouble("price"), rs.getString("description"));
-                Desktop desk = (Desktop) prod;
-                pList.add(desk);
-            } else if (category.equals("laptops")) {
-                prod = new Laptop(rs.getDouble("screensize"), rs.getDouble("weight"), rs.getInt("battery"), rs.getDouble("processor"), rs.getInt("ram"), rs.getInt("harddrive"), rs.getInt("id"), rs.getString("name"), rs.getDouble("price"), rs.getString("description"));
-                Laptop lap = (Laptop) prod;
-                pList.add(lap);
-            } else if (category.equals("washingmachine")) {
-                prod = new WashingMachine(rs.getInt("rpm"), rs.getDouble("capacity"), rs.getInt("noiselevel"), rs.getInt("energyusage"), rs.getInt("id"), rs.getString("name"), rs.getDouble("price"), rs.getString("description"));
-                WashingMachine wash = (WashingMachine) prod;
-                pList.add(wash);
-            } else if (category.equals("freezers")) {
-                prod = new Fridge(rs.getDouble("volume"), rs.getInt("shelf"), rs.getInt("noiselevel"), rs.getInt("energyusage"), rs.getInt("id"), rs.getString("name"), rs.getDouble("price"), rs.getString("description"));
-                Fridge fridge = (Fridge) prod;
-                pList.add(fridge);
-            } else if (category.equals("tv")) {
-                prod = new Tv(rs.getDouble("screensize"), rs.getString("resolution"), rs.getString("paneltype"), rs.getInt("soundlevel"), rs.getString("color"), rs.getInt("id"), rs.getString("name"), rs.getDouble("price"), rs.getString("description"));
-                Tv tv = (Tv) prod;
-                pList.add(tv);
-            } else if (category.equals("radio")) {
-                prod = new Radio(rs.getInt("battery"), rs.getInt("effect"), rs.getInt("soundlevel"), rs.getString("color"), rs.getInt("id"), rs.getString("name"), rs.getDouble("price"), rs.getString("description"));
-                Radio rad = (Radio) prod;
-                pList.add(rad);
+            switch (category) {
+                case "desktops":
+                    prod = new Desktop(rs.getString("formfactor"), rs.getBoolean("integratedwifi"), rs.getDouble("processor"), rs.getInt("ram"), rs.getInt("harddrive"), rs.getInt("id"), rs.getString("name"), rs.getDouble("price"), rs.getString("description"));
+                    Desktop desk = (Desktop) prod;
+                    pList.add(desk);
+                    break;
+                case "laptops":
+                    prod = new Laptop(rs.getDouble("screensize"), rs.getDouble("weight"), rs.getInt("battery"), rs.getDouble("processor"), rs.getInt("ram"), rs.getInt("harddrive"), rs.getInt("id"), rs.getString("name"), rs.getDouble("price"), rs.getString("description"));
+                    Laptop lap = (Laptop) prod;
+                    pList.add(lap);
+                    break;
+                case "washingmachine":
+                    prod = new WashingMachine(rs.getInt("rpm"), rs.getDouble("capacity"), rs.getInt("noiselevel"), rs.getInt("energyusage"), rs.getInt("id"), rs.getString("name"), rs.getDouble("price"), rs.getString("description"));
+                    WashingMachine wash = (WashingMachine) prod;
+                    pList.add(wash);
+                    break;
+                case "freezers":
+                    prod = new Fridge(rs.getDouble("volume"), rs.getInt("shelf"), rs.getInt("noiselevel"), rs.getInt("energyusage"), rs.getInt("id"), rs.getString("name"), rs.getDouble("price"), rs.getString("description"));
+                    Fridge fridge = (Fridge) prod;
+                    pList.add(fridge);
+                    break;
+                case "tv":
+                    prod = new Tv(rs.getDouble("screensize"), rs.getString("resolution"), rs.getString("paneltype"), rs.getInt("soundlevel"), rs.getString("color"), rs.getInt("id"), rs.getString("name"), rs.getDouble("price"), rs.getString("description"));
+                    Tv tv = (Tv) prod;
+                    pList.add(tv);
+                    break;
+                case "radio":
+                    prod = new Radio(rs.getInt("battery"), rs.getInt("effect"), rs.getInt("soundlevel"), rs.getString("color"), rs.getInt("id"), rs.getString("name"), rs.getDouble("price"), rs.getString("description"));
+                    Radio rad = (Radio) prod;
+                    pList.add(rad);
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -141,20 +158,28 @@ public class ProductConnector extends SuperDB {
 
     public ArrayList findProducts(String category, ArrayList<String> columns, String name, String price, String col1, String col2, String col3, String col4, String col5, String col6) throws SQLException {
         ArrayList pList;
-        if (category.equals("desktops")) {
-            pList = new ArrayList<Desktop>();
-        } else if (category.equals("laptops")) {
-            pList = new ArrayList<Laptop>();
-        } else if (category.equals("washingmachine")) {
-            pList = new ArrayList<WashingMachine>();
-        } else if (category.equals("freezers")) {
-            pList = new ArrayList<Fridge>();
-        } else if (category.equals("tv")) {
-            pList = new ArrayList<Tv>();
-        } else if (category.equals("radio")) {
-            pList = new ArrayList<Radio>();
-        } else {
-            pList = new ArrayList<Product>();
+        switch (category) {
+            case "desktops":
+                pList = new ArrayList<Desktop>();
+                break;
+            case "laptops":
+                pList = new ArrayList<Laptop>();
+                break;
+            case "washingmachine":
+                pList = new ArrayList<WashingMachine>();
+                break;
+            case "freezers":
+                pList = new ArrayList<Fridge>();
+                break;
+            case "tv":
+                pList = new ArrayList<Tv>();
+                break;
+            case "radio":
+                pList = new ArrayList<Radio>();
+                break;
+            default:
+                pList = new ArrayList<Product>();
+                break;
         }
         int cSize = columns.size();
         cSize--;
@@ -199,12 +224,16 @@ public class ProductConnector extends SuperDB {
                 double dMax = d * 1.25;
                 sb.append(" AND ").append(columnName).append(" BETWEEN ").append(dMin).append(" AND ").append(dMax);
             } else if (columnName.equals("integratedwifi")) { // BOOLEAN COLUMN-NAME-CHECK
-                if (colSearch.equals("yes")) {
-                    sb.append(" AND ").append(columnName).append(" = true");
-                } else if (colSearch.equals("no")) {
-                    sb.append(" AND ").append(columnName).append(" = false");
-                } else {
-                    sb.append(" AND ").append(columnName).append(" = false");
+                switch (colSearch) {
+                    case "yes":
+                        sb.append(" AND ").append(columnName).append(" = true");
+                        break;
+                    case "no":
+                        sb.append(" AND ").append(columnName).append(" = false");
+                        break;
+                    default:
+                        sb.append(" AND ").append(columnName).append(" = false");
+                        break;
                 }
             } else {
                 sb.append(" AND ").append(columnName).append(" ILIKE '%").append(colSearch).append("%' ");
@@ -217,30 +246,39 @@ public class ProductConnector extends SuperDB {
         int q = 0;
         while (rs.next() && q < 10) {
             Product prod = null;
-            if (category.equals("desktops")) {
-                prod = new Desktop(rs.getString("formfactor"), rs.getBoolean("integratedwifi"), rs.getDouble("processor"), rs.getInt("ram"), rs.getInt("harddrive"), rs.getInt("id"), rs.getString("name"), rs.getDouble("price"), rs.getString("description"));
-                Desktop desk = (Desktop) prod;
-                pList.add(desk);
-            } else if (category.equals("laptops")) {
-                prod = new Laptop(rs.getDouble("screensize"), rs.getDouble("weight"), rs.getInt("battery"), rs.getDouble("processor"), rs.getInt("ram"), rs.getInt("harddrive"), rs.getInt("id"), rs.getString("name"), rs.getDouble("price"), rs.getString("description"));
-                Laptop lap = (Laptop) prod;
-                pList.add(lap);
-            } else if (category.equals("washingmachine")) {
-                prod = new WashingMachine(rs.getInt("rpm"), rs.getDouble("capacity"), rs.getInt("noiselevel"), rs.getInt("energyusage"), rs.getInt("id"), rs.getString("name"), rs.getDouble("price"), rs.getString("description"));
-                WashingMachine wash = (WashingMachine) prod;
-                pList.add(wash);
-            } else if (category.equals("freezers")) {
-                prod = new Fridge(rs.getDouble("volume"), rs.getInt("shelf"), rs.getInt("noiselevel"), rs.getInt("energyusage"), rs.getInt("id"), rs.getString("name"), rs.getDouble("price"), rs.getString("description"));
-                Fridge fridge = (Fridge) prod;
-                pList.add(fridge);
-            } else if (category.equals("tv")) {
-                prod = new Tv(rs.getDouble("screensize"), rs.getString("resolution"), rs.getString("paneltype"), rs.getInt("soundlevel"), rs.getString("color"), rs.getInt("id"), rs.getString("name"), rs.getDouble("price"), rs.getString("description"));
-                Tv tv = (Tv) prod;
-                pList.add(tv);
-            } else if (category.equals("radio")) {
-                prod = new Radio(rs.getInt("battery"), rs.getInt("effect"), rs.getInt("soundlevel"), rs.getString("color"), rs.getInt("id"), rs.getString("name"), rs.getDouble("price"), rs.getString("description"));
-                Radio rad = (Radio) prod;
-                pList.add(rad);
+            switch (category) {
+                case "desktops":
+                    prod = new Desktop(rs.getString("formfactor"), rs.getBoolean("integratedwifi"), rs.getDouble("processor"), rs.getInt("ram"), rs.getInt("harddrive"), rs.getInt("id"), rs.getString("name"), rs.getDouble("price"), rs.getString("description"));
+                    Desktop desk = (Desktop) prod;
+                    pList.add(desk);
+                    break;
+                case "laptops":
+                    prod = new Laptop(rs.getDouble("screensize"), rs.getDouble("weight"), rs.getInt("battery"), rs.getDouble("processor"), rs.getInt("ram"), rs.getInt("harddrive"), rs.getInt("id"), rs.getString("name"), rs.getDouble("price"), rs.getString("description"));
+                    Laptop lap = (Laptop) prod;
+                    pList.add(lap);
+                    break;
+                case "washingmachine":
+                    prod = new WashingMachine(rs.getInt("rpm"), rs.getDouble("capacity"), rs.getInt("noiselevel"), rs.getInt("energyusage"), rs.getInt("id"), rs.getString("name"), rs.getDouble("price"), rs.getString("description"));
+                    WashingMachine wash = (WashingMachine) prod;
+                    pList.add(wash);
+                    break;
+                case "freezers":
+                    prod = new Fridge(rs.getDouble("volume"), rs.getInt("shelf"), rs.getInt("noiselevel"), rs.getInt("energyusage"), rs.getInt("id"), rs.getString("name"), rs.getDouble("price"), rs.getString("description"));
+                    Fridge fridge = (Fridge) prod;
+                    pList.add(fridge);
+                    break;
+                case "tv":
+                    prod = new Tv(rs.getDouble("screensize"), rs.getString("resolution"), rs.getString("paneltype"), rs.getInt("soundlevel"), rs.getString("color"), rs.getInt("id"), rs.getString("name"), rs.getDouble("price"), rs.getString("description"));
+                    Tv tv = (Tv) prod;
+                    pList.add(tv);
+                    break;
+                case "radio":
+                    prod = new Radio(rs.getInt("battery"), rs.getInt("effect"), rs.getInt("soundlevel"), rs.getString("color"), rs.getInt("id"), rs.getString("name"), rs.getDouble("price"), rs.getString("description"));
+                    Radio rad = (Radio) prod;
+                    pList.add(rad);
+                    break;
+                default:
+                    break;
             }
         }
 

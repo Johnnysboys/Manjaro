@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -213,12 +212,12 @@ public class FXMLDocumentController implements Initializable {
 
     @FXML
     private void clearBasket(ActionEvent event) {
-        activeUser.getBasket().emptyBasket();
+        this.activeUser.getBasket().emptyBasket();
         this.updateBasket();
     }
 
     private void updateBasket() {
-        basketView.getColumns().clear();
+        this.basketView.getColumns().clear();
 
         TableColumn<Map.Entry<Product, String>, String> column1 = new TableColumn<>("Product Name");
         column1.setCellValueFactory((TableColumn.CellDataFeatures<Map.Entry<Product, String>, String> p) -> new SimpleStringProperty(p.getValue().getKey().getProductName()));
@@ -229,51 +228,58 @@ public class FXMLDocumentController implements Initializable {
         TableColumn<Map.Entry<String, String>, String> column3 = new TableColumn<>("Quantity");
         column3.setCellValueFactory((TableColumn.CellDataFeatures<Map.Entry<String, String>, String> p) -> new SimpleStringProperty(String.valueOf(p.getValue().getValue())));
 
-        ObservableList<Map.Entry<String, String>> items = FXCollections.observableArrayList(activeUser.getBasket().getProductMap().entrySet());
+        ObservableList<Map.Entry<String, String>> items = FXCollections.observableArrayList(this.activeUser.getBasket().getProductMap().entrySet());
 
         column1.setMaxWidth(200);
         column2.setMaxWidth(75);
         column3.setMaxWidth(75);
-        basketView.setMaxWidth(350);
+        this.basketView.setMaxWidth(350);
 
-        basketView.getColumns().setAll(column1, column2, column3);
+        this.basketView.getColumns().setAll(column1, column2, column3);
 
-        basketView.setItems(items);
-        totalLabel.setText(String.valueOf(activeUser.getBasket().getTotal()));
+        this.basketView.setItems(items);
+        this.totalLabel.setText(String.valueOf(this.activeUser.getBasket().getTotal()));
     }
 
     @FXML
     private void handleLogin(ActionEvent event) throws SQLException {
-        String email = emailField.getText();
-        String pw = pwField.getText();
+        String email = this.emailField.getText();
+        String pw = this.pwField.getText();
 
-        loggedInPerson = accCon.login(email, pw, activeUser.getBasket());
+        this.loggedInPerson = accCon.login(email, pw, this.activeUser.getBasket());
 
-        if (loggedInPerson == null) {
-            createModal("Unknown user or password, try again.", AlertType.ERROR, true, "Login", "Login error");
+        if (this.loggedInPerson == null) {
+            this.createModal("Unknown user or password, try again.", AlertType.ERROR, true, "Login", "Login error");
         } else {
-            activeUser = loggedInPerson;
-            loginPane.setVisible(false);
+            this.activeUser = this.loggedInPerson;
+            this.loginPane.setVisible(false);
 
             StringBuilder sb = new StringBuilder();
 
-            sb.append(loggedInPerson.getEmail()).append(" ");
-            sb.append(loggedInPerson.getTitle());
-            userInfoLabel.setText(sb.toString());
-            loggedInPane.setVisible(true);
-            createModal("Logged in as " + sb.toString(), AlertType.CONFIRMATION, true, "Login", "Login successful");
+            sb.append(this.loggedInPerson.getEmail()).append(" ");
+            sb.append(this.loggedInPerson.getTitle());
+            this.userInfoLabel.setText(sb.toString());
+            this.loggedInPane.setVisible(true);
+            this.createModal("Logged in as " + sb.toString(), AlertType.CONFIRMATION, true, "Login", "Login successful");
 
-            if (activeUser.getSec() == 1) {         // Is a Customer
-                tabPane.getTabs().add(orderHistTab);
-                tabPane.getTabs().remove(signUpTab);
-            } else if (activeUser.getSec() == 2) {  // Is an Employee
-                tabPane.getTabs().add(employeeOrderTab);
-                tabPane.getTabs().remove(signUpTab);
-
-            } else if (activeUser.getSec() == 3) {  // Is an Administrator
-                tabPane.getTabs().remove(signUpTab);
-                tabPane.getTabs().add(prodManTab);
-
+            switch (this.activeUser.getSec()) {
+                case 1:
+                    // Is a Customer
+                    this.tabPane.getTabs().add(this.orderHistTab);
+                    this.tabPane.getTabs().remove(this.signUpTab);
+                    break;
+                case 2:
+                    // Is an Employee
+                    this.tabPane.getTabs().add(this.employeeOrderTab);
+                    this.tabPane.getTabs().remove(this.signUpTab);
+                    break;
+                case 3:
+                    // Is an Administrator
+                    this.tabPane.getTabs().remove(this.signUpTab);
+                    this.tabPane.getTabs().add(this.prodManTab);
+                    break;
+                default:
+                    break;
             }
 
         }
@@ -282,37 +288,37 @@ public class FXMLDocumentController implements Initializable {
 
     @FXML
     private void handleLogout(ActionEvent event) {
-        loggedInPane.setVisible(false);
-        loginPane.setVisible(true);
-        signUpTab.setDisable(false);
+        this.loggedInPane.setVisible(false);
+        this.loginPane.setVisible(true);
+        this.signUpTab.setDisable(false);
 
-        activeUser = new Visitor(activeUser.getBasket());
-        tabPane.getTabs().remove(orderHistTab);
-        tabPane.getTabs().remove(employeeOrderTab);
-        tabPane.getTabs().remove(prodManTab);
-        tabPane.getTabs().add(signUpTab);
-        loggedInPerson = null;
+        this.activeUser = new Visitor(this.activeUser.getBasket());
+        this.tabPane.getTabs().remove(orderHistTab);
+        this.tabPane.getTabs().remove(employeeOrderTab);
+        this.tabPane.getTabs().remove(prodManTab);
+        this.tabPane.getTabs().add(signUpTab);
+        this.loggedInPerson = null;
     }
 
     @FXML
     private void handleManCommit(ActionEvent event) throws SQLException {
-        int id = prodManView.getSelectionModel().getSelectedItem().getProductId();
-        String newDesc = prodManArea.getText();
-        prodCon.changeProductDesc(id, newDesc);
-        prodManArea.clear();
-        prodManCommitButton.setDisable(true);
+        int id = this.prodManView.getSelectionModel().getSelectedItem().getProductId();
+        String newDesc = this.prodManArea.getText();
+        this.prodCon.changeProductDesc(id, newDesc);
+        this.prodManArea.clear();
+        this.prodManCommitButton.setDisable(true);
         this.prodManSearchHandle(event);
     }
 
     @FXML
     private void prodManSearchHandle(ActionEvent event) throws SQLException {
-        String searchQuery = prodManSearchField.getText();
-        String category = (String) categoryDropMan.getValue();
-        ArrayList<String> columns = prodCon.getColumns(category);
+        String searchQuery = this.prodManSearchField.getText();
+        String category = (String) this.categoryDropMan.getValue();
+        ArrayList<String> columns = this.prodCon.getColumns(category);
 
-        prodManView.getColumns().clear();
+        this.prodManView.getColumns().clear();
 
-        prodManSearch = FXCollections.observableArrayList(prodCon.findProductsByName(category, searchQuery));
+        this.prodManSearch = FXCollections.observableArrayList(this.prodCon.findProductsByName(category, searchQuery));
 
         switch (category) {
             case "desktops": {
@@ -324,15 +330,15 @@ public class FXMLDocumentController implements Initializable {
                 TableColumn c7 = new TableColumn(columns.get(7));
                 TableColumn c8 = new TableColumn(columns.get(8));
 
-                prodManView.getColumns().addAll(c1, c2, c4, c5, c6, c7, c8);
+                this.prodManView.getColumns().addAll(c1, c2, c4, c5, c6, c7, c8);
 
-                c1.setCellValueFactory(new PropertyValueFactory<Product, String>("productName"));
-                c2.setCellValueFactory(new PropertyValueFactory<Product, String>("price"));
-                c4.setCellValueFactory(new PropertyValueFactory<Product, String>("processor"));
-                c5.setCellValueFactory(new PropertyValueFactory<Product, String>("ram"));
-                c6.setCellValueFactory(new PropertyValueFactory<Product, String>("harddrivesSize"));
-                c7.setCellValueFactory(new PropertyValueFactory<Product, String>("formfactor"));
-                c8.setCellValueFactory(new PropertyValueFactory<Product, String>("integratedWifi"));
+                c1.setCellValueFactory(new PropertyValueFactory<>("productName"));
+                c2.setCellValueFactory(new PropertyValueFactory<>("price"));
+                c4.setCellValueFactory(new PropertyValueFactory<>("processor"));
+                c5.setCellValueFactory(new PropertyValueFactory<>("ram"));
+                c6.setCellValueFactory(new PropertyValueFactory<>("harddrivesSize"));
+                c7.setCellValueFactory(new PropertyValueFactory<>("formfactor"));
+                c8.setCellValueFactory(new PropertyValueFactory<>("integratedWifi"));
                 break;
             }
             case "washingmachine": {
@@ -343,13 +349,13 @@ public class FXMLDocumentController implements Initializable {
                 TableColumn c6 = new TableColumn(columns.get(6));
                 TableColumn c7 = new TableColumn(columns.get(7));
 
-                prodManView.getColumns().addAll(c1, c2, c4, c5, c6, c7);
-                c1.setCellValueFactory(new PropertyValueFactory<Product, String>("productName"));
-                c2.setCellValueFactory(new PropertyValueFactory<Product, String>("price"));
-                c4.setCellValueFactory(new PropertyValueFactory<Product, String>("noiseLevel"));
-                c5.setCellValueFactory(new PropertyValueFactory<Product, String>("energyUsage"));
-                c6.setCellValueFactory(new PropertyValueFactory<Product, String>("rpm"));
-                c7.setCellValueFactory(new PropertyValueFactory<Product, String>("capacity"));
+                this.prodManView.getColumns().addAll(c1, c2, c4, c5, c6, c7);
+                c1.setCellValueFactory(new PropertyValueFactory<>("productName"));
+                c2.setCellValueFactory(new PropertyValueFactory<>("price"));
+                c4.setCellValueFactory(new PropertyValueFactory<>("noiseLevel"));
+                c5.setCellValueFactory(new PropertyValueFactory<>("energyUsage"));
+                c6.setCellValueFactory(new PropertyValueFactory<>("rpm"));
+                c7.setCellValueFactory(new PropertyValueFactory<>("capacity"));
                 break;
             }
             case "freezers": {
@@ -360,13 +366,13 @@ public class FXMLDocumentController implements Initializable {
                 TableColumn c6 = new TableColumn(columns.get(6));
                 TableColumn c7 = new TableColumn(columns.get(7));
 
-                prodManView.getColumns().addAll(c1, c2, c4, c5, c6, c7);
-                c1.setCellValueFactory(new PropertyValueFactory<Product, String>("productName"));
-                c2.setCellValueFactory(new PropertyValueFactory<Product, String>("price"));
-                c4.setCellValueFactory(new PropertyValueFactory<Product, String>("noiseLevel"));
-                c5.setCellValueFactory(new PropertyValueFactory<Product, String>("energyUsage"));
-                c6.setCellValueFactory(new PropertyValueFactory<Product, String>("volume"));
-                c7.setCellValueFactory(new PropertyValueFactory<Product, String>("shelfs"));
+                this.prodManView.getColumns().addAll(c1, c2, c4, c5, c6, c7);
+                c1.setCellValueFactory(new PropertyValueFactory<>("productName"));
+                c2.setCellValueFactory(new PropertyValueFactory<>("price"));
+                c4.setCellValueFactory(new PropertyValueFactory<>("noiseLevel"));
+                c5.setCellValueFactory(new PropertyValueFactory<>("energyUsage"));
+                c6.setCellValueFactory(new PropertyValueFactory<>("volume"));
+                c7.setCellValueFactory(new PropertyValueFactory<>("shelfs"));
                 break;
             }
             case "tv": {
@@ -378,14 +384,14 @@ public class FXMLDocumentController implements Initializable {
                 TableColumn c7 = new TableColumn(columns.get(7));
                 TableColumn c8 = new TableColumn(columns.get(8));
 
-                prodManView.getColumns().addAll(c1, c2, c4, c5, c6, c7, c8);
-                c1.setCellValueFactory(new PropertyValueFactory<Product, String>("productName"));
-                c2.setCellValueFactory(new PropertyValueFactory<Product, String>("price"));
-                c4.setCellValueFactory(new PropertyValueFactory<Product, String>("soundLevel"));
-                c5.setCellValueFactory(new PropertyValueFactory<Product, String>("color"));
-                c6.setCellValueFactory(new PropertyValueFactory<Product, String>("screenSize"));
-                c7.setCellValueFactory(new PropertyValueFactory<Product, String>("resolution"));
-                c8.setCellValueFactory(new PropertyValueFactory<Product, String>("panelType"));
+                this.prodManView.getColumns().addAll(c1, c2, c4, c5, c6, c7, c8);
+                c1.setCellValueFactory(new PropertyValueFactory<>("productName"));
+                c2.setCellValueFactory(new PropertyValueFactory<>("price"));
+                c4.setCellValueFactory(new PropertyValueFactory<>("soundLevel"));
+                c5.setCellValueFactory(new PropertyValueFactory<>("color"));
+                c6.setCellValueFactory(new PropertyValueFactory<>("screenSize"));
+                c7.setCellValueFactory(new PropertyValueFactory<>("resolution"));
+                c8.setCellValueFactory(new PropertyValueFactory<>("panelType"));
                 break;
             }
             case "radio": {
@@ -396,13 +402,13 @@ public class FXMLDocumentController implements Initializable {
                 TableColumn c6 = new TableColumn(columns.get(6));
                 TableColumn c7 = new TableColumn(columns.get(7));
 
-                prodManView.getColumns().addAll(c1, c2, c4, c5, c6, c7);
-                c1.setCellValueFactory(new PropertyValueFactory<Product, String>("productName"));
-                c2.setCellValueFactory(new PropertyValueFactory<Product, String>("price"));
-                c4.setCellValueFactory(new PropertyValueFactory<Product, String>("soundLevel"));
-                c5.setCellValueFactory(new PropertyValueFactory<Product, String>("color"));
-                c6.setCellValueFactory(new PropertyValueFactory<Product, String>("batteryLife"));
-                c7.setCellValueFactory(new PropertyValueFactory<Product, String>("effect"));
+                this.prodManView.getColumns().addAll(c1, c2, c4, c5, c6, c7);
+                c1.setCellValueFactory(new PropertyValueFactory<>("productName"));
+                c2.setCellValueFactory(new PropertyValueFactory<>("price"));
+                c4.setCellValueFactory(new PropertyValueFactory<>("soundLevel"));
+                c5.setCellValueFactory(new PropertyValueFactory<>("color"));
+                c6.setCellValueFactory(new PropertyValueFactory<>("batteryLife"));
+                c7.setCellValueFactory(new PropertyValueFactory<>("effect"));
                 break;
             }
             case "laptops": {
@@ -415,15 +421,15 @@ public class FXMLDocumentController implements Initializable {
                 TableColumn c8 = new TableColumn(columns.get(8));
                 TableColumn c9 = new TableColumn(columns.get(9));
 
-                prodManView.getColumns().addAll(c1, c2, c4, c5, c6, c7, c8, c9);
-                c1.setCellValueFactory(new PropertyValueFactory<Product, String>("productName"));
-                c2.setCellValueFactory(new PropertyValueFactory<Product, String>("price"));
-                c4.setCellValueFactory(new PropertyValueFactory<Product, String>("processor"));
-                c5.setCellValueFactory(new PropertyValueFactory<Product, String>("ram"));
-                c6.setCellValueFactory(new PropertyValueFactory<Product, String>("harddrivesSize"));
-                c7.setCellValueFactory(new PropertyValueFactory<Product, String>("screenSize"));
-                c8.setCellValueFactory(new PropertyValueFactory<Product, String>("weight"));
-                c9.setCellValueFactory(new PropertyValueFactory<Product, String>("batteryLife"));
+                this.prodManView.getColumns().addAll(c1, c2, c4, c5, c6, c7, c8, c9);
+                c1.setCellValueFactory(new PropertyValueFactory<>("productName"));
+                c2.setCellValueFactory(new PropertyValueFactory<>("price"));
+                c4.setCellValueFactory(new PropertyValueFactory<>("processor"));
+                c5.setCellValueFactory(new PropertyValueFactory<>("ram"));
+                c6.setCellValueFactory(new PropertyValueFactory<>("harddrivesSize"));
+                c7.setCellValueFactory(new PropertyValueFactory<>("screenSize"));
+                c8.setCellValueFactory(new PropertyValueFactory<>("weight"));
+                c9.setCellValueFactory(new PropertyValueFactory<>("batteryLife"));
                 break;
             }
             default:
@@ -431,141 +437,141 @@ public class FXMLDocumentController implements Initializable {
                 break;
         }
 
-        prodManView.setItems(prodManSearch);
+        this.prodManView.setItems(this.prodManSearch);
     }
 
     @FXML
     private void searchProducts(ActionEvent event) throws SQLException {
-        String category = (String) categoryDrop.getValue();
-        String name = nameField.getText();
-        String price = priceField.getText();
-        String col1 = column1Field.getText();
-        String col2 = column2Field.getText();
-        String col3 = column3Field.getText();
-        String col4 = column4Field.getText();
-        String col5 = column5Field.getText();
-        String col6 = column6Field.getText();
+        String category = (String) this.categoryDrop.getValue();
+        String name = this.nameField.getText();
+        String price = this.priceField.getText();
+        String col1 = this.column1Field.getText();
+        String col2 = this.column2Field.getText();
+        String col3 = this.column3Field.getText();
+        String col4 = this.column4Field.getText();
+        String col5 = this.column5Field.getText();
+        String col6 = this.column6Field.getText();
 
-        prodSearch = FXCollections.observableArrayList(prodCon.findProducts(category, catColumnsList, name, price, col1, col2, col3, col4, col5, col6));
-        if (prodSearch == null) {
+        this.prodSearch = FXCollections.observableArrayList(this.prodCon.findProducts(category, this.catColumnsList, name, price, col1, col2, col3, col4, col5, col6));
+        if (this.prodSearch == null) {
             String msg = "No products found";
             createModal(msg, AlertType.WARNING, true, "Warning", "Warning");
             return;
         }
 
-        productTable.setEditable(true);
-        int columnAmount = catColumnsList.size();
+        this.productTable.setEditable(true);
+        int columnAmount = this.catColumnsList.size();
         columnAmount--;
-        productTable.getColumns().clear();
+        this.productTable.getColumns().clear();
         switch (category) {
             case "desktops": {
-                TableColumn c1 = new TableColumn(catColumnsList.get(1));
-                TableColumn c2 = new TableColumn(catColumnsList.get(2));
-                TableColumn c4 = new TableColumn(catColumnsList.get(4));
-                TableColumn c5 = new TableColumn(catColumnsList.get(5));
-                TableColumn c6 = new TableColumn(catColumnsList.get(6));
-                TableColumn c7 = new TableColumn(catColumnsList.get(7));
-                TableColumn c8 = new TableColumn(catColumnsList.get(8));
+                TableColumn c1 = new TableColumn(this.catColumnsList.get(1));
+                TableColumn c2 = new TableColumn(this.catColumnsList.get(2));
+                TableColumn c4 = new TableColumn(this.catColumnsList.get(4));
+                TableColumn c5 = new TableColumn(this.catColumnsList.get(5));
+                TableColumn c6 = new TableColumn(this.catColumnsList.get(6));
+                TableColumn c7 = new TableColumn(this.catColumnsList.get(7));
+                TableColumn c8 = new TableColumn(this.catColumnsList.get(8));
 
-                productTable.getColumns().addAll(c1, c2, c4, c5, c6, c7, c8);
+                this.productTable.getColumns().addAll(c1, c2, c4, c5, c6, c7, c8);
 
-                c1.setCellValueFactory(new PropertyValueFactory<Product, String>("productName"));
-                c2.setCellValueFactory(new PropertyValueFactory<Product, String>("price"));
-                c4.setCellValueFactory(new PropertyValueFactory<Product, String>("processor"));
-                c5.setCellValueFactory(new PropertyValueFactory<Product, String>("ram"));
-                c6.setCellValueFactory(new PropertyValueFactory<Product, String>("harddrivesSize"));
-                c7.setCellValueFactory(new PropertyValueFactory<Product, String>("formfactor"));
-                c8.setCellValueFactory(new PropertyValueFactory<Product, String>("integratedWifi"));
+                c1.setCellValueFactory(new PropertyValueFactory<>("productName"));
+                c2.setCellValueFactory(new PropertyValueFactory<>("price"));
+                c4.setCellValueFactory(new PropertyValueFactory<>("processor"));
+                c5.setCellValueFactory(new PropertyValueFactory<>("ram"));
+                c6.setCellValueFactory(new PropertyValueFactory<>("harddrivesSize"));
+                c7.setCellValueFactory(new PropertyValueFactory<>("formfactor"));
+                c8.setCellValueFactory(new PropertyValueFactory<>("integratedWifi"));
                 break;
             }
             case "washingmachine": {
-                TableColumn c1 = new TableColumn(catColumnsList.get(1));
-                TableColumn c2 = new TableColumn(catColumnsList.get(2));
-                TableColumn c4 = new TableColumn(catColumnsList.get(4));
-                TableColumn c5 = new TableColumn(catColumnsList.get(5));
-                TableColumn c6 = new TableColumn(catColumnsList.get(6));
-                TableColumn c7 = new TableColumn(catColumnsList.get(7));
+                TableColumn c1 = new TableColumn(this.catColumnsList.get(1));
+                TableColumn c2 = new TableColumn(this.catColumnsList.get(2));
+                TableColumn c4 = new TableColumn(this.catColumnsList.get(4));
+                TableColumn c5 = new TableColumn(this.catColumnsList.get(5));
+                TableColumn c6 = new TableColumn(this.catColumnsList.get(6));
+                TableColumn c7 = new TableColumn(this.catColumnsList.get(7));
 
-                productTable.getColumns().addAll(c1, c2, c4, c5, c6, c7);
-                c1.setCellValueFactory(new PropertyValueFactory<Product, String>("productName"));
-                c2.setCellValueFactory(new PropertyValueFactory<Product, String>("price"));
-                c4.setCellValueFactory(new PropertyValueFactory<Product, String>("noiseLevel"));
-                c5.setCellValueFactory(new PropertyValueFactory<Product, String>("energyUsage"));
-                c6.setCellValueFactory(new PropertyValueFactory<Product, String>("rpm"));
-                c7.setCellValueFactory(new PropertyValueFactory<Product, String>("capacity"));
+                this.productTable.getColumns().addAll(c1, c2, c4, c5, c6, c7);
+                c1.setCellValueFactory(new PropertyValueFactory<>("productName"));
+                c2.setCellValueFactory(new PropertyValueFactory<>("price"));
+                c4.setCellValueFactory(new PropertyValueFactory<>("noiseLevel"));
+                c5.setCellValueFactory(new PropertyValueFactory<>("energyUsage"));
+                c6.setCellValueFactory(new PropertyValueFactory<>("rpm"));
+                c7.setCellValueFactory(new PropertyValueFactory<>("capacity"));
                 break;
             }
             case "freezers": {
-                TableColumn c1 = new TableColumn(catColumnsList.get(1));
-                TableColumn c2 = new TableColumn(catColumnsList.get(2));
-                TableColumn c4 = new TableColumn(catColumnsList.get(4));
-                TableColumn c5 = new TableColumn(catColumnsList.get(5));
-                TableColumn c6 = new TableColumn(catColumnsList.get(6));
-                TableColumn c7 = new TableColumn(catColumnsList.get(7));
-                productTable.getColumns().addAll(c1, c2, c4, c5, c6, c7);
-                c1.setCellValueFactory(new PropertyValueFactory<Product, String>("productName"));
-                c2.setCellValueFactory(new PropertyValueFactory<Product, String>("price"));
-                c4.setCellValueFactory(new PropertyValueFactory<Product, String>("noiseLevel"));
-                c5.setCellValueFactory(new PropertyValueFactory<Product, String>("energyUsage"));
-                c6.setCellValueFactory(new PropertyValueFactory<Product, String>("volume"));
-                c7.setCellValueFactory(new PropertyValueFactory<Product, String>("shelfs"));
+                TableColumn c1 = new TableColumn(this.catColumnsList.get(1));
+                TableColumn c2 = new TableColumn(this.catColumnsList.get(2));
+                TableColumn c4 = new TableColumn(this.catColumnsList.get(4));
+                TableColumn c5 = new TableColumn(this.catColumnsList.get(5));
+                TableColumn c6 = new TableColumn(this.catColumnsList.get(6));
+                TableColumn c7 = new TableColumn(this.catColumnsList.get(7));
+                this.productTable.getColumns().addAll(c1, c2, c4, c5, c6, c7);
+                c1.setCellValueFactory(new PropertyValueFactory<>("productName"));
+                c2.setCellValueFactory(new PropertyValueFactory<>("price"));
+                c4.setCellValueFactory(new PropertyValueFactory<>("noiseLevel"));
+                c5.setCellValueFactory(new PropertyValueFactory<>("energyUsage"));
+                c6.setCellValueFactory(new PropertyValueFactory<>("volume"));
+                c7.setCellValueFactory(new PropertyValueFactory<>("shelfs"));
                 break;
             }
             case "tv": {
-                TableColumn c1 = new TableColumn(catColumnsList.get(1));
-                TableColumn c2 = new TableColumn(catColumnsList.get(2));
-                TableColumn c4 = new TableColumn(catColumnsList.get(4));
-                TableColumn c5 = new TableColumn(catColumnsList.get(5));
-                TableColumn c6 = new TableColumn(catColumnsList.get(6));
-                TableColumn c7 = new TableColumn(catColumnsList.get(7));
-                TableColumn c8 = new TableColumn(catColumnsList.get(8));
+                TableColumn c1 = new TableColumn(this.catColumnsList.get(1));
+                TableColumn c2 = new TableColumn(this.catColumnsList.get(2));
+                TableColumn c4 = new TableColumn(this.catColumnsList.get(4));
+                TableColumn c5 = new TableColumn(this.catColumnsList.get(5));
+                TableColumn c6 = new TableColumn(this.catColumnsList.get(6));
+                TableColumn c7 = new TableColumn(this.catColumnsList.get(7));
+                TableColumn c8 = new TableColumn(this.catColumnsList.get(8));
 
-                productTable.getColumns().addAll(c1, c2, c4, c5, c6, c7, c8);
-                c1.setCellValueFactory(new PropertyValueFactory<Product, String>("productName"));
-                c2.setCellValueFactory(new PropertyValueFactory<Product, String>("price"));
-                c4.setCellValueFactory(new PropertyValueFactory<Product, String>("soundLevel"));
-                c5.setCellValueFactory(new PropertyValueFactory<Product, String>("color"));
-                c6.setCellValueFactory(new PropertyValueFactory<Product, String>("screenSize"));
-                c7.setCellValueFactory(new PropertyValueFactory<Product, String>("resolution"));
-                c8.setCellValueFactory(new PropertyValueFactory<Product, String>("panelType"));
+                this.productTable.getColumns().addAll(c1, c2, c4, c5, c6, c7, c8);
+                c1.setCellValueFactory(new PropertyValueFactory<>("productName"));
+                c2.setCellValueFactory(new PropertyValueFactory<>("price"));
+                c4.setCellValueFactory(new PropertyValueFactory<>("soundLevel"));
+                c5.setCellValueFactory(new PropertyValueFactory<>("color"));
+                c6.setCellValueFactory(new PropertyValueFactory<>("screenSize"));
+                c7.setCellValueFactory(new PropertyValueFactory<>("resolution"));
+                c8.setCellValueFactory(new PropertyValueFactory<>("panelType"));
                 break;
             }
             case "radio": {
-                TableColumn c1 = new TableColumn(catColumnsList.get(1));
-                TableColumn c2 = new TableColumn(catColumnsList.get(2));
-                TableColumn c4 = new TableColumn(catColumnsList.get(4));
-                TableColumn c5 = new TableColumn(catColumnsList.get(5));
-                TableColumn c6 = new TableColumn(catColumnsList.get(6));
-                TableColumn c7 = new TableColumn(catColumnsList.get(7));
+                TableColumn c1 = new TableColumn(this.catColumnsList.get(1));
+                TableColumn c2 = new TableColumn(this.catColumnsList.get(2));
+                TableColumn c4 = new TableColumn(this.catColumnsList.get(4));
+                TableColumn c5 = new TableColumn(this.catColumnsList.get(5));
+                TableColumn c6 = new TableColumn(this.catColumnsList.get(6));
+                TableColumn c7 = new TableColumn(this.catColumnsList.get(7));
 
-                productTable.getColumns().addAll(c1, c2, c4, c5, c6, c7);
-                c1.setCellValueFactory(new PropertyValueFactory<Product, String>("productName"));
-                c2.setCellValueFactory(new PropertyValueFactory<Product, String>("price"));
-                c4.setCellValueFactory(new PropertyValueFactory<Product, String>("soundLevel"));
-                c5.setCellValueFactory(new PropertyValueFactory<Product, String>("color"));
-                c6.setCellValueFactory(new PropertyValueFactory<Product, String>("batteryLife"));
-                c7.setCellValueFactory(new PropertyValueFactory<Product, String>("effect"));
+                this.productTable.getColumns().addAll(c1, c2, c4, c5, c6, c7);
+                c1.setCellValueFactory(new PropertyValueFactory<>("productName"));
+                c2.setCellValueFactory(new PropertyValueFactory<>("price"));
+                c4.setCellValueFactory(new PropertyValueFactory<>("soundLevel"));
+                c5.setCellValueFactory(new PropertyValueFactory<>("color"));
+                c6.setCellValueFactory(new PropertyValueFactory<>("batteryLife"));
+                c7.setCellValueFactory(new PropertyValueFactory<>("effect"));
                 break;
             }
             case "laptops": {
-                TableColumn c1 = new TableColumn(catColumnsList.get(1));
-                TableColumn c2 = new TableColumn(catColumnsList.get(2));
-                TableColumn c4 = new TableColumn(catColumnsList.get(4));
-                TableColumn c5 = new TableColumn(catColumnsList.get(5));
-                TableColumn c6 = new TableColumn(catColumnsList.get(6));
-                TableColumn c7 = new TableColumn(catColumnsList.get(7));
-                TableColumn c8 = new TableColumn(catColumnsList.get(8));
-                TableColumn c9 = new TableColumn(catColumnsList.get(9));
+                TableColumn c1 = new TableColumn(this.catColumnsList.get(1));
+                TableColumn c2 = new TableColumn(this.catColumnsList.get(2));
+                TableColumn c4 = new TableColumn(this.catColumnsList.get(4));
+                TableColumn c5 = new TableColumn(this.catColumnsList.get(5));
+                TableColumn c6 = new TableColumn(this.catColumnsList.get(6));
+                TableColumn c7 = new TableColumn(this.catColumnsList.get(7));
+                TableColumn c8 = new TableColumn(this.catColumnsList.get(8));
+                TableColumn c9 = new TableColumn(this.catColumnsList.get(9));
 
-                productTable.getColumns().addAll(c1, c2, c4, c5, c6, c7, c8, c9);
-                c1.setCellValueFactory(new PropertyValueFactory<Product, String>("productName"));
-                c2.setCellValueFactory(new PropertyValueFactory<Product, String>("price"));
-                c4.setCellValueFactory(new PropertyValueFactory<Product, String>("processor"));
-                c5.setCellValueFactory(new PropertyValueFactory<Product, String>("ram"));
-                c6.setCellValueFactory(new PropertyValueFactory<Product, String>("harddrivesSize"));
-                c7.setCellValueFactory(new PropertyValueFactory<Product, String>("screenSize"));
-                c8.setCellValueFactory(new PropertyValueFactory<Product, String>("weight"));
-                c9.setCellValueFactory(new PropertyValueFactory<Product, String>("batteryLife"));
+                this.productTable.getColumns().addAll(c1, c2, c4, c5, c6, c7, c8, c9);
+                c1.setCellValueFactory(new PropertyValueFactory<>("productName"));
+                c2.setCellValueFactory(new PropertyValueFactory<>("price"));
+                c4.setCellValueFactory(new PropertyValueFactory<>("processor"));
+                c5.setCellValueFactory(new PropertyValueFactory<>("ram"));
+                c6.setCellValueFactory(new PropertyValueFactory<>("harddrivesSize"));
+                c7.setCellValueFactory(new PropertyValueFactory<>("screenSize"));
+                c8.setCellValueFactory(new PropertyValueFactory<>("weight"));
+                c9.setCellValueFactory(new PropertyValueFactory<>("batteryLife"));
                 break;
             }
             default:
@@ -608,39 +614,39 @@ public class FXMLDocumentController implements Initializable {
 
         actionCol.setCellFactory(cellFactory);
 
-        productTable.getColumns().add(actionCol);
+        this.productTable.getColumns().add(actionCol);
 
         //Row Hover Mechanic
-        productTable.setRowFactory(tableView -> {
+        this.productTable.setRowFactory(tableView -> {
             final TableRow<Product> row = new TableRow<>();
 
             row.hoverProperty().addListener((observable) -> {
                 final Product product = row.getItem();
-                productDescArea.clear();
+                this.productDescArea.clear();
                 if (row.isHover() && product != null) {
-                    productDescArea.setText(product.getDescription());
+                    this.productDescArea.setText(product.getDescription());
                 } else {
-                    productDescArea.setText("Hover over a product to see its description.");
+                    this.productDescArea.setText("Hover over a product to see its description.");
                 }
             });
 
             return row;
         });
 
-        productTable.setItems(prodSearch);
+        this.productTable.setItems(this.prodSearch);
     }
 
     @FXML
     private void searchForOrders() throws SQLException {
 
-        String searchCriteria = empOrderSearchField.getText();
+        String searchCriteria = this.empOrderSearchField.getText();
 
         if (searchCriteria.equals("")) {
             return;
         } else {
-            empOrderList = orderCon.getOrderOverview(searchCriteria);
+            this.empOrderList = orderCon.getOrderOverview(searchCriteria);
 
-            empOrderView.getColumns().clear();
+            this.empOrderView.getColumns().clear();
             TableColumn orderNumber = new TableColumn("Order ID");
             TableColumn orderPrice = new TableColumn("Price Total");
             TableColumn orderDate = new TableColumn("Date");
@@ -649,9 +655,9 @@ public class FXMLDocumentController implements Initializable {
             orderPrice.setCellValueFactory(new PropertyValueFactory("priceTotal"));
             orderDate.setCellValueFactory(new PropertyValueFactory("orderDate"));
 
-            empOrderView.getColumns().addAll(orderNumber, orderPrice, orderDate);
+            this.empOrderView.getColumns().addAll(orderNumber, orderPrice, orderDate);
 
-            empOrderView.setItems(empOrderList);
+            this.empOrderView.setItems(this.empOrderList);
 
         }
 
@@ -659,7 +665,7 @@ public class FXMLDocumentController implements Initializable {
 
     @FXML
     private void showOrderHistory() {
-        orderView.getColumns().clear();
+        this.orderView.getColumns().clear();
 
         TableColumn orderNumber = new TableColumn("Order ID");
         TableColumn orderPrice = new TableColumn("Price Total");
@@ -669,10 +675,10 @@ public class FXMLDocumentController implements Initializable {
         orderPrice.setCellValueFactory(new PropertyValueFactory("priceTotal"));
         orderDate.setCellValueFactory(new PropertyValueFactory("orderDate"));
 
-        orderView.getColumns().addAll(orderNumber, orderPrice, orderDate);
+        this.orderView.getColumns().addAll(orderNumber, orderPrice, orderDate);
 
         try {
-            orderView.setItems(orderCon.getOrderOverview(loggedInPerson.getEmail()));
+            this.orderView.setItems(this.orderCon.getOrderOverview(this.loggedInPerson.getEmail()));
         } catch (SQLException ex) {
             Logger.getLogger(FXMLDocumentController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -684,95 +690,95 @@ public class FXMLDocumentController implements Initializable {
         if (basketView.getItems().isEmpty()) {
             baskerOrderButton.disableProperty();
         } else {
-            Order order = new Order(activeUser.getBasket());
+            Order order = new Order(this.activeUser.getBasket());
 
-            if (loggedInPerson == null) {
+            if (this.loggedInPerson == null) {
                 visitorBuyHandler(event, order);
                 payHandler(event, order);
             } else {
-                order.setAdress(loggedInPerson.getAddress());
-                order.setCustomerId(loggedInPerson.getId());
-                order.setEmail(loggedInPerson.getEmail());
-                order.setName(loggedInPerson.getName());
-                order.setPhoneNumber(loggedInPerson.getPhone());
+                order.setAdress(this.loggedInPerson.getAddress());
+                order.setCustomerId(this.loggedInPerson.getId());
+                order.setEmail(this.loggedInPerson.getEmail());
+                order.setName(this.loggedInPerson.getName());
+                order.setPhoneNumber(this.loggedInPerson.getPhone());
 
                 payHandler(event, order);
             }
-            orderList.add(order);
+            this.orderList.add(order);
         }
     }
 
     @FXML
     private void changeSelection(ActionEvent event) throws SQLException {
-        generalPane.setVisible(true);
-        String s = (String) categoryDrop.getValue();
-        catColumnsList = prodCon.getColumns(s);
-        searchButton.setDisable(false);
+        this.generalPane.setVisible(true);
+        String s = (String) this.categoryDrop.getValue();
+        this.catColumnsList = this.prodCon.getColumns(s);
+        this.searchButton.setDisable(false);
 
-        int columnSize = catColumnsList.size();
+        int columnSize = this.catColumnsList.size();
         columnSize--;
 
-        column1Pane.setVisible(false);
-        column2Pane.setVisible(false);
-        column3Pane.setVisible(false);
-        column4Pane.setVisible(false);
-        column5Pane.setVisible(false);
-        column6Pane.setVisible(false);
+        this.column1Pane.setVisible(false);
+        this.column2Pane.setVisible(false);
+        this.column3Pane.setVisible(false);
+        this.column4Pane.setVisible(false);
+        this.column5Pane.setVisible(false);
+        this.column6Pane.setVisible(false);
 
         switch (columnSize) {
             case 5:
-                column1Label.setText(catColumnsList.get(4));
-                column1Pane.setVisible(true);
+                this.column1Label.setText(this.catColumnsList.get(4));
+                this.column1Pane.setVisible(true);
                 break;
             case 6:
-                column1Label.setText(catColumnsList.get(4));
-                column2Label.setText(catColumnsList.get(5));
-                column1Pane.setVisible(true);
-                column2Pane.setVisible(true);
+                this.column1Label.setText(this.catColumnsList.get(4));
+                this.column2Label.setText(this.catColumnsList.get(5));
+                this.column1Pane.setVisible(true);
+                this.column2Pane.setVisible(true);
                 break;
             case 7:
-                column1Label.setText(catColumnsList.get(4));
-                column2Label.setText(catColumnsList.get(5));
-                column3Label.setText(catColumnsList.get(6));
-                column1Pane.setVisible(true);
-                column2Pane.setVisible(true);
-                column3Pane.setVisible(true);
+                this.column1Label.setText(this.catColumnsList.get(4));
+                this.column2Label.setText(this.catColumnsList.get(5));
+                this.column3Label.setText(this.catColumnsList.get(6));
+                this.column1Pane.setVisible(true);
+                this.column2Pane.setVisible(true);
+                this.column3Pane.setVisible(true);
                 break;
             case 8:
-                column1Label.setText(catColumnsList.get(4));
-                column2Label.setText(catColumnsList.get(5));
-                column3Label.setText(catColumnsList.get(6));
-                column4Label.setText(catColumnsList.get(7));
-                column1Pane.setVisible(true);
-                column2Pane.setVisible(true);
-                column3Pane.setVisible(true);
-                column4Pane.setVisible(true);
+                this.column1Label.setText(this.catColumnsList.get(4));
+                this.column2Label.setText(this.catColumnsList.get(5));
+                this.column3Label.setText(this.catColumnsList.get(6));
+                this.column4Label.setText(this.catColumnsList.get(7));
+                this.column1Pane.setVisible(true);
+                this.column2Pane.setVisible(true);
+                this.column3Pane.setVisible(true);
+                this.column4Pane.setVisible(true);
                 break;
             case 9:
-                column1Label.setText(catColumnsList.get(4));
-                column2Label.setText(catColumnsList.get(5));
-                column3Label.setText(catColumnsList.get(6));
-                column4Label.setText(catColumnsList.get(7));
-                column5Label.setText(catColumnsList.get(8));
-                column1Pane.setVisible(true);
-                column2Pane.setVisible(true);
-                column3Pane.setVisible(true);
-                column4Pane.setVisible(true);
-                column5Pane.setVisible(true);
+                this.column1Label.setText(this.catColumnsList.get(4));
+                this.column2Label.setText(this.catColumnsList.get(5));
+                this.column3Label.setText(this.catColumnsList.get(6));
+                this.column4Label.setText(this.catColumnsList.get(7));
+                this.column5Label.setText(this.catColumnsList.get(8));
+                this.column1Pane.setVisible(true);
+                this.column2Pane.setVisible(true);
+                this.column3Pane.setVisible(true);
+                this.column4Pane.setVisible(true);
+                this.column5Pane.setVisible(true);
                 break;
             case 10:
-                column1Label.setText(catColumnsList.get(4));
-                column2Label.setText(catColumnsList.get(5));
-                column3Label.setText(catColumnsList.get(6));
-                column4Label.setText(catColumnsList.get(7));
-                column5Label.setText(catColumnsList.get(8));
-                column6Label.setText(catColumnsList.get(9));
-                column1Pane.setVisible(true);
-                column2Pane.setVisible(true);
-                column3Pane.setVisible(true);
-                column4Pane.setVisible(true);
-                column5Pane.setVisible(true);
-                column6Pane.setVisible(true);
+                this.column1Label.setText(this.catColumnsList.get(4));
+                this.column2Label.setText(this.catColumnsList.get(5));
+                this.column3Label.setText(this.catColumnsList.get(6));
+                this.column4Label.setText(this.catColumnsList.get(7));
+                this.column5Label.setText(this.catColumnsList.get(8));
+                this.column6Label.setText(this.catColumnsList.get(9));
+                this.column1Pane.setVisible(true);
+                this.column2Pane.setVisible(true);
+                this.column3Pane.setVisible(true);
+                this.column4Pane.setVisible(true);
+                this.column5Pane.setVisible(true);
+                this.column6Pane.setVisible(true);
                 break;
 
         }
@@ -780,22 +786,22 @@ public class FXMLDocumentController implements Initializable {
 
     @FXML
     private void createAccount(ActionEvent event) throws SQLException {
-        String email = emailEntry.getText();
-        String name = nameEntry.getText();
-        String address = addressEntry.getText();
-        String phone = phoneEntry.getText();
-        String pw = pwEntry.getText();
+        String email = this.emailEntry.getText();
+        String name = this.nameEntry.getText();
+        String address = this.addressEntry.getText();
+        String phone = this.phoneEntry.getText();
+        String pw = this.pwEntry.getText();
 
         if (Checker.checkAccount(email, name, phone) == true) {
             if (accCon.accountExists(email)) {
-                signErrorLabel.setText("An account with this email already exists.");
+                this.signErrorLabel.setText("An account with this email already exists.");
             } else {
-                accCon.insertAccount(email, name, phone, address, pw);
-                signErrorLabel.setText("Your account has been created. Enjoy!");
+                this.accCon.insertAccount(email, name, phone, address, pw);
+                this.signErrorLabel.setText("Your account has been created. Enjoy!");
             }
 
         } else {
-            signErrorLabel.setText("Some of the entered information is invalid");
+            this.signErrorLabel.setText("Some of the entered information is invalid");
         }
 
     }
@@ -833,10 +839,10 @@ public class FXMLDocumentController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        activeUser = new Visitor();
-        accCon = new AccountsConnector("jdbc:postgresql://151.80.57.19:5432/admin_semester", "admin_willf", "2111993");
-        prodCon = new ProductConnector("jdbc:postgresql://151.80.57.19:5432/admin_semester", "admin_willf", "2111993");
-        orderCon = new OrderConnector("jdbc:postgresql://151.80.57.19:5432/admin_semester", "admin_willf", "2111993");
+        this.activeUser = new Visitor();
+        this.accCon = new AccountsConnector("jdbc:postgresql://151.80.57.19:5432/admin_semester", "admin_willf", "2111993");
+        this.prodCon = new ProductConnector("jdbc:postgresql://151.80.57.19:5432/admin_semester", "admin_willf", "2111993");
+        this.orderCon = new OrderConnector("jdbc:postgresql://151.80.57.19:5432/admin_semester", "admin_willf", "2111993");
         ListProperty<String> listProperty = new SimpleListProperty<String>(FXCollections.<String>observableArrayList());
         listProperty.add("desktops");
         listProperty.add("washingmachine");
@@ -844,26 +850,26 @@ public class FXMLDocumentController implements Initializable {
         listProperty.add("tv");
         listProperty.add("freezers");
         listProperty.add("laptops");
-        categoryDrop.setItems(listProperty);
-        categoryDropMan.setItems(listProperty);
+        this.categoryDrop.setItems(listProperty);
+        this.categoryDropMan.setItems(listProperty);
 
-        generalPane.setVisible(false);
+        this.generalPane.setVisible(false);
 
-        productTable.getColumns().clear();
+        this.productTable.getColumns().clear();
 
-        tabPane.getTabs().removeAll(orderHistTab, prodManTab, employeeOrderTab);
-        prodManCommitButton.setDisable(true);
+        this.tabPane.getTabs().removeAll(this.orderHistTab, this.prodManTab, this.employeeOrderTab);
+        this.prodManCommitButton.setDisable(true);
 
-        prodManView.getSelectionModel().selectedItemProperty().addListener((observable) -> {
-            final Product product = prodManView.getSelectionModel().selectedItemProperty().get();
+        this.prodManView.getSelectionModel().selectedItemProperty().addListener((observable) -> {
+            final Product product = this.prodManView.getSelectionModel().selectedItemProperty().get();
             if (product != null) {
-                prodManArea.clear();
-                prodManArea.setText(product.getDescription());
-                prodManCommitButton.setDisable(true);
+                this.prodManArea.clear();
+                this.prodManArea.setText(product.getDescription());
+                this.prodManCommitButton.setDisable(true);
             }
         });
 
-        prodManArea.textProperty().addListener(new ChangeListener<String>() {
+        this.prodManArea.textProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(final ObservableValue<? extends String> observable, final String oldValue, final String newValue) {
                 prodManCommitButton.setDisable(false);
@@ -929,7 +935,7 @@ public class FXMLDocumentController implements Initializable {
                 String msg = "You didnt pay for the order";
                 createModal(msg, Alert.AlertType.WARNING, true);
             } else {
-                orderCon.insertOrder(order);
+                this.orderCon.insertOrder(order);
             }
 
         } catch (IOException ex) {

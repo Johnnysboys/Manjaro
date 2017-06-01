@@ -64,19 +64,13 @@ public class Order {
 
     public double getCalcTotal() {
         double total = 0;
-
-        Set<Product> keySet = productMap.keySet();
+        Set<Product> keySet = this.productMap.keySet();
         Iterator<Product> keyIterator = keySet.iterator();
-
         while (keyIterator.hasNext()) {
             Product product = keyIterator.next();
-            int currentValue = productMap.get(product);
-
+            int currentValue = this.productMap.get(product);
             total = total + (product.getPrice() * currentValue);
-            System.out.println(total);
-
         }
-
         return total;
     }
 
@@ -166,11 +160,7 @@ public class Order {
 
     public ObservableList<Product> getKeySet() {
         List<Product> keys = new ArrayList<>(productMap.keySet());
-
         ObservableList<Product> keyList = FXCollections.observableArrayList(keys);
-
         return keyList;
-
     }
-
 }
