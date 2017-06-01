@@ -828,7 +828,7 @@ public class FXMLDocumentController implements Initializable {
         Alert closeAlert = new Alert(Alert.AlertType.NONE);
         closeAlert.setTitle("How to use the program?");
         closeAlert.setHeaderText("This is how you use the program!");
-        closeAlert.setContentText("1. Insert text here.\n2. Insert text here.\n3. Insert text here. ");
+        closeAlert.setContentText("1. Search for products in browse-tab and add to basket. \n2. By clicking on update in the baske-tab you can get an overview of the selected products. \n3. Finally click order and pay to proceed. \n4 If you prefer to create an account click the signup-tab. ");
         closeAlert.setResizable(true);
         ButtonType closeButton = new ButtonType("Close");
         closeAlert.getButtonTypes().setAll(closeButton);
