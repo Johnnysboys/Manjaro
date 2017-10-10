@@ -66,17 +66,16 @@ public class ProductConnector extends SuperDB {
         }
         return list;
     }
-    
-    public void changeProductDesc(int id, String desc) throws SQLException{
+
+    public void changeProductDesc(int id, String desc) throws SQLException {
         String query = "UPDATE products set description = ? WHERE id = ?";
         PreparedStatement descChange = this.getCon().prepareStatement(query);
         descChange.setString(1, desc);
         descChange.setInt(2, id);
-        
+
         descChange.execute();
-        
-        
     }
+
     
 
     public ArrayList findProductsByName(String category, String name) throws SQLException {
@@ -109,8 +108,7 @@ public class ProductConnector extends SuperDB {
         sb.append("SELECT * FROM ").append(category);
         sb.append(" WHERE ");
         sb.append("name ILIKE '%").append(name).append("%'");
-        
-        
+
         PreparedStatement ps = this.getCon().prepareStatement(sb.toString());
         ResultSet rs = ps.executeQuery();
         int q = 0;
@@ -283,6 +281,21 @@ public class ProductConnector extends SuperDB {
         }
 
         return pList;
+    }
+    public void addProductToDatabase(String name, double price, String description, String productType) throws SQLException {
+        //Her laves et preparedStatement, som eksekverer SQL-kode
+        PreparedStatement statement = getCon().prepareStatement("INSERT INTO products (name,price,description, producttype) VALUES (?,?,?,?)");
+        //SetString bruges til at sætte værdierne på spørgsmålstegnene
+        //Den kigger på name og finder ud af det er en string. 
+        statement.setString(1, name);
+        statement.setDouble(2, price);
+        statement.setString(3, description);
+        statement.setString(4, productType);
+        statement.executeUpdate();
+        //Husker at lukke forbindelse og statement, så der ikke kommer SQL-injections
+        getCon().close(); 
+        statement.close();
+
     }
 
 }

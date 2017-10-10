@@ -26,15 +26,19 @@ public class AccountsConnector extends SuperDB {
 
     public LoggedInPerson login(String email, String pw, Basket basket) throws SQLException {
         String loginSearch = "SELECT * FROM accounts WHERE email = ? AND pw = ?;";
+        //Laver et prepared Statement, som eksekverer SQL-statement. Henter forbindelsen til
+        //databasen og sætter loginSearch som parameter
         PreparedStatement search = this.getCon().prepareStatement(loginSearch);
-
+        //Sætter stringen 1 fordi det er email der står først
         search.setString(1, email);
         search.setString(2, pw);
-
+        
+        //SQL statement der læser data fra databasen skal returnere det til et resultset
         ResultSet rs = search.executeQuery();
 
         LoggedInPerson person = null;
-
+        
+        //Kigger på næste række i databasen og returnere true, hvis der er noget
         while (rs.next()) {
             int id = rs.getInt("id");
             String email1 = rs.getString("email");

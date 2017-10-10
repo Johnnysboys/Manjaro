@@ -204,10 +204,20 @@ public class FXMLDocumentController implements Initializable {
     private TextArea prodManArea;
     @FXML
     private Button prodManCommitButton;
+    @FXML
+    private Tab addProductTab;
+    @FXML
+    private TextField addProductNameField;
+    @FXML
+    private TextField addProductDescriptionField;
+    @FXML
+    private TextField addProductPriceField;
+    @FXML
+    private TextField addProductTypeField;
 
     @FXML
     private void handleBasketUpdate(ActionEvent event) {
-        this.updateBasket();
+        this.updateBasket(); //Knappen som updaterer kurven
     }
 
     @FXML
@@ -217,9 +227,13 @@ public class FXMLDocumentController implements Initializable {
     }
 
     private void updateBasket() {
+        //Henter alle kolonner fra tableviewet og fjerner dem.
         this.basketView.getColumns().clear();
 
+        //Laver en ny tablekolonne, som består af Map.entry(som er en klasse der består af en key og dens value)
+        //Og så består den også af en String
         TableColumn<Map.Entry<Product, String>, String> column1 = new TableColumn<>("Product Name");
+        //Nedenunder assosieres dataen med en kolonne, der bliver altså ikke sat nogen værdi. Den 
         column1.setCellValueFactory((TableColumn.CellDataFeatures<Map.Entry<Product, String>, String> p) -> new SimpleStringProperty(p.getValue().getKey().getProductName()));
 
         TableColumn<Map.Entry<Product, String>, String> column2 = new TableColumn<>("Price");
@@ -228,32 +242,42 @@ public class FXMLDocumentController implements Initializable {
         TableColumn<Map.Entry<String, String>, String> column3 = new TableColumn<>("Quantity");
         column3.setCellValueFactory((TableColumn.CellDataFeatures<Map.Entry<String, String>, String> p) -> new SimpleStringProperty(String.valueOf(p.getValue().getValue())));
 
+        //Opretter en observableList som består af et entrySet med Strings. Det bliver sat til at være en 
+        //observableArrayList, som tableView kan arbejde med. Henter personens kurv og derfra hashMappet med produkter
         ObservableList<Map.Entry<String, String>> items = FXCollections.observableArrayList(this.activeUser.getBasket().getProductMap().entrySet());
 
+        //Sætter mål på kolonnerne
         column1.setMaxWidth(200);
         column2.setMaxWidth(75);
         column3.setMaxWidth(75);
         this.basketView.setMaxWidth(350);
 
+        //Henter de kolonner der er en del af tableviewet og sætter de nyoprettet kolonner
         this.basketView.getColumns().setAll(column1, column2, column3);
-
+        //Sætter værdierne iform af den observablelist i tableviewet
         this.basketView.setItems(items);
         this.totalLabel.setText(String.valueOf(this.activeUser.getBasket().getTotal()));
     }
 
     @FXML
     private void handleLogin(ActionEvent event) throws SQLException {
+        //Håndterer loginvinduet. Henter teksten der bliver skrevet under email og password
         String email = this.emailField.getText();
         String pw = this.pwField.getText();
 
+        //Sætter den nye loggedinperson
         this.loggedInPerson = accCon.login(email, pw, this.activeUser.getBasket());
 
+        //Hvis ikke der findes nogen med de oplysninger popper der et vindue op, som melder fejl
+        //Ellers sættes en person = med indloggetperson
         if (this.loggedInPerson == null) {
             this.createModal("Unknown user or password, try again.", AlertType.ERROR, true, "Login", "Login error");
         } else {
             this.activeUser = this.loggedInPerson;
             this.loginPane.setVisible(false);
 
+            //Opretter en stringbuilder, hvor der står:
+            //"Logged in as + emailen og titlen"
             StringBuilder sb = new StringBuilder();
 
             sb.append(this.loggedInPerson.getEmail()).append(" ");
@@ -262,21 +286,26 @@ public class FXMLDocumentController implements Initializable {
             this.loggedInPane.setVisible(true);
             this.createModal("Logged in as " + sb.toString(), AlertType.CONFIRMATION, true, "Login", "Login successful");
 
+            //Der laves et switch statement, som henter sikkerhedsniveauet af personen
+            //Derefter sættes panes afhængigt af hvem det er der logger ind.
             switch (this.activeUser.getSec()) {
                 case 1:
                     // Is a Customer
                     this.tabPane.getTabs().add(this.orderHistTab);
                     this.tabPane.getTabs().remove(this.signUpTab);
+                    this.tabPane.getTabs().remove(this.addProductTab);
                     break;
                 case 2:
                     // Is an Employee
                     this.tabPane.getTabs().add(this.employeeOrderTab);
                     this.tabPane.getTabs().remove(this.signUpTab);
+                    this.tabPane.getTabs().remove(this.addProductTab);
                     break;
                 case 3:
                     // Is an Administrator
                     this.tabPane.getTabs().remove(this.signUpTab);
                     this.tabPane.getTabs().add(this.prodManTab);
+                    this.tabPane.getTabs().add(this.addProductTab);
                     break;
                 default:
                     break;
@@ -286,12 +315,15 @@ public class FXMLDocumentController implements Initializable {
 
     }
 
+    //Dette er metoden for logud-knappen
     @FXML
     private void handleLogout(ActionEvent event) {
+        //Logind-området sættes bl.a. til false
         this.loggedInPane.setVisible(false);
         this.loginPane.setVisible(true);
         this.signUpTab.setDisable(false);
 
+        //Personen sættes til at være en besøgende, da vedkommende ikke er logget ind
         this.activeUser = new Visitor(this.activeUser.getBasket());
         this.tabPane.getTabs().remove(orderHistTab);
         this.tabPane.getTabs().remove(employeeOrderTab);
@@ -300,28 +332,53 @@ public class FXMLDocumentController implements Initializable {
         this.loggedInPerson = null;
     }
 
+    //Denne metode hører til knappen commit, når administratoren har ændret
+    //en beskrivelse af et produkt
     @FXML
     private void handleManCommit(ActionEvent event) throws SQLException {
+        //En metoden, som gør det muligt at vælge ved at føre musen over et produkt
+        //i tableviewet af produktet
         int id = this.prodManView.getSelectionModel().getSelectedItem().getProductId();
+        //Det som står i redigeringsfeltet af produktet, lægges over i en 
+        //String newDesciption
         String newDesc = this.prodManArea.getText();
+        //kører metoden changeProductDescription, som
+        //sætter id, til at have en ny beskrivelse
         this.prodCon.changeProductDesc(id, newDesc);
+        //Rydder redigeringsområdet, efter der er ændret beskrivelse
         this.prodManArea.clear();
+        //Commit-knappen sættes til at være usynlig
         this.prodManCommitButton.setDisable(true);
+        //Kører metoden nedenunder
         this.prodManSearchHandle(event);
     }
 
+    //Denne metode lader administratoren søge efter produkter,
+    //hvis beskrivelse skal redigeres
     @FXML
     private void prodManSearchHandle(ActionEvent event) throws SQLException {
+        //String som henter det der står i søgefeltet
         String searchQuery = this.prodManSearchField.getText();
+        //henter værdien af det der står i dropdownmenuen
         String category = (String) this.categoryDropMan.getValue();
+        //Henter kolonnerne og lægger dem over i en arrayliste af Strings
         ArrayList<String> columns = this.prodCon.getColumns(category);
 
+        //Henter alle aktuelle kolonner i tablewviewet og fjerner indholdet af dem
         this.prodManView.getColumns().clear();
 
+        //laver en ny observableArrayliste, som tableview kan arbejde med. 
+        //arraylisten tager category som parameter som er værdien fra dropdownmenuen,
+        //men også searchquery,som er det administratoren skriver ind. 
+        //Fx. er category fra dropdown desktops og så skrives der lenovo ind i søgefeltet
         this.prodManSearch = FXCollections.observableArrayList(this.prodCon.findProductsByName(category, searchQuery));
 
+        //Der laves en switch over category, der er dropdownmenuen. I tilfælde af desktops....
         switch (category) {
             case "desktops": {
+                //Lav en ny tablekolonne
+                //Columns indeholder alle kolonner, så afhængigt af switch casen vises de specifikke kolonner.
+                
                 TableColumn c1 = new TableColumn(columns.get(1));
                 TableColumn c2 = new TableColumn(columns.get(2));
                 TableColumn c4 = new TableColumn(columns.get(4));
@@ -330,8 +387,14 @@ public class FXMLDocumentController implements Initializable {
                 TableColumn c7 = new TableColumn(columns.get(7));
                 TableColumn c8 = new TableColumn(columns.get(8));
 
+                //Her tilføjes alle ovenstående kolonner til tableviewet
                 this.prodManView.getColumns().addAll(c1, c2, c4, c5, c6, c7, c8);
 
+                /* setCellValueFactory sætter ingen værdier, men udtrækker værdier.
+                Det bruges til at associere en kollonne i et tableview med en klasses
+                egenskaber, som indeholder data. I dette tilfælde er det databasen. 
+                Det fortæller altså at der skal kigges på fx. productName i et table
+                 */
                 c1.setCellValueFactory(new PropertyValueFactory<>("productName"));
                 c2.setCellValueFactory(new PropertyValueFactory<>("price"));
                 c4.setCellValueFactory(new PropertyValueFactory<>("processor"));
@@ -432,17 +495,21 @@ public class FXMLDocumentController implements Initializable {
                 c9.setCellValueFactory(new PropertyValueFactory<>("batteryLife"));
                 break;
             }
+            //Hvis andre er gældende køres default, som fortæller at kategorien ikke registreret
             default:
                 System.out.println("Category not recognized.");
                 break;
         }
-
+        //Indsætter den observablelist i tableviewet
         this.prodManView.setItems(this.prodManSearch);
     }
 
     @FXML
     private void searchProducts(ActionEvent event) throws SQLException {
+        //henter værdien af det der står i dropdownmenuen
         String category = (String) this.categoryDrop.getValue();
+
+        //Henter informationer i de forskellige tekstfelter
         String name = this.nameField.getText();
         String price = this.priceField.getText();
         String col1 = this.column1Field.getText();
@@ -452,17 +519,26 @@ public class FXMLDocumentController implements Initializable {
         String col5 = this.column5Field.getText();
         String col6 = this.column6Field.getText();
 
+        //laver en ny observableArrayliste, som tableview kan arbejde med. 
+        //arraylisten tager category som parameter som er værdien fra dropdownmenuen,
+        //men men også alle tesktFelterne, som den besøgende har indtastet. 
+        //Fx. er category fra dropdown desktops og så skrives der lenovo ind i søgefeltet
         this.prodSearch = FXCollections.observableArrayList(this.prodCon.findProducts(category, this.catColumnsList, name, price, col1, col2, col3, col4, col5, col6));
+        //Hvis den observableList er tom, kommer der et vindue frem med en warning
         if (this.prodSearch == null) {
             String msg = "No products found";
             createModal(msg, AlertType.WARNING, true, "Warning", "Warning");
             return;
         }
-
+        //Tableviewet productTablet kan nu redigeres
         this.productTable.setEditable(true);
+        //Bliver ikke brugt. Fejl ved aflevering.
         int columnAmount = this.catColumnsList.size();
         columnAmount--;
+        //Henter alle aktuelle kolonner i tablewviewet og fjerner indholdet af dem
         this.productTable.getColumns().clear();
+
+        //Der laves en switch over category, der er dropdownmenuen. I tilfælde af desktops....
         switch (category) {
             case "desktops": {
                 TableColumn c1 = new TableColumn(this.catColumnsList.get(1));
@@ -473,8 +549,14 @@ public class FXMLDocumentController implements Initializable {
                 TableColumn c7 = new TableColumn(this.catColumnsList.get(7));
                 TableColumn c8 = new TableColumn(this.catColumnsList.get(8));
 
+                //Her tilføjes alle ovenstående kolonner til tableviewet
                 this.productTable.getColumns().addAll(c1, c2, c4, c5, c6, c7, c8);
 
+                /* setCellValueFactory sætter ingen værdier, men udtrækker værdier.
+                Det bruges til at associere en kollonne i et tableview med en klasses
+                egenskaber, som indeholder data. I dette tilfælde er det databasen. 
+                Det fortæller altså at der skal kigges på fx. productName i et table
+                 */
                 c1.setCellValueFactory(new PropertyValueFactory<>("productName"));
                 c2.setCellValueFactory(new PropertyValueFactory<>("price"));
                 c4.setCellValueFactory(new PropertyValueFactory<>("processor"));
@@ -574,18 +656,18 @@ public class FXMLDocumentController implements Initializable {
                 c9.setCellValueFactory(new PropertyValueFactory<>("batteryLife"));
                 break;
             }
+            //Hvis andre er gældende køres default, som fortæller at kategorien ikke registreret
             default:
                 System.out.println("Category not recognized.");
                 break;
         }
-
-        //Button column
+        //Det er jakob der har stået for den sidste del af metoden
+        //Tilføjer knappen addBasket
         TableColumn actionCol = new TableColumn(" ");
         actionCol.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
 
         Callback<TableColumn<Product, String>, TableCell<Product, String>> cellFactory
-                = //
-                new Callback<TableColumn<Product, String>, TableCell<Product, String>>() {
+                = new Callback<TableColumn<Product, String>, TableCell<Product, String>>() {
             @Override
             public TableCell call(final TableColumn<Product, String> param) {
                 final TableCell<Product, String> cell = new TableCell<Product, String>() {
@@ -632,21 +714,27 @@ public class FXMLDocumentController implements Initializable {
 
             return row;
         });
-
+        //Indsætter observablelist i tableviewet
         this.productTable.setItems(this.prodSearch);
     }
-
+    //Denne metode gør det muligt for employee at søge efter ordrer
     @FXML
     private void searchForOrders() throws SQLException {
 
+        //Henter teksten hvor brugeren skriver søgeordet
         String searchCriteria = this.empOrderSearchField.getText();
 
+        //Hvis ikke der bliver søgt på noget returnes ingenting
         if (searchCriteria.equals("")) {
             return;
+            //
         } else {
+            //Ellers viser den en liste over ordre ud fra den indtastede emailadresse
             this.empOrderList = orderCon.getOrderOverview(searchCriteria);
 
+            //Henter alle aktuelle kolonner i tablewviewet og fjerner indholdet af dem
             this.empOrderView.getColumns().clear();
+
             TableColumn orderNumber = new TableColumn("Order ID");
             TableColumn orderPrice = new TableColumn("Price Total");
             TableColumn orderDate = new TableColumn("Date");
@@ -655,28 +743,39 @@ public class FXMLDocumentController implements Initializable {
             orderPrice.setCellValueFactory(new PropertyValueFactory("priceTotal"));
             orderDate.setCellValueFactory(new PropertyValueFactory("orderDate"));
 
+            //Her tilføjes alle ovenstående kolonner til tableviewet
             this.empOrderView.getColumns().addAll(orderNumber, orderPrice, orderDate);
 
+            //Indsætter observablelist i tableviewet
             this.empOrderView.setItems(this.empOrderList);
 
         }
 
     }
-
+    //Denne metode viser ordrehistorikken
     @FXML
     private void showOrderHistory() {
+        //Henter alle aktuelle kolonner i tablewviewet og fjerner indholdet af dem
         this.orderView.getColumns().clear();
 
+        //Opretter en ny tablekolonne med navnet Order ID
         TableColumn orderNumber = new TableColumn("Order ID");
         TableColumn orderPrice = new TableColumn("Price Total");
         TableColumn orderDate = new TableColumn("Date");
 
+        /* setCellValueFactory sætter ingen værdier, men udtrækker værdier.
+                Det bruges til at associere en kollonne i et tableview med en klasses
+                egenskaber, som indeholder data. I dette tilfælde er det databasen. 
+                Det fortæller altså at der skal kigges på fx. productName i et table
+         */
         orderNumber.setCellValueFactory(new PropertyValueFactory<>("orderID"));
         orderPrice.setCellValueFactory(new PropertyValueFactory("priceTotal"));
         orderDate.setCellValueFactory(new PropertyValueFactory("orderDate"));
-
+        
+        //Her tilføjes alle ovenstående kolonner til tableviewet
         this.orderView.getColumns().addAll(orderNumber, orderPrice, orderDate);
-
+        
+        //Viser ordrehistorikken ud fra den indlogget persons emailadresse
         try {
             this.orderView.setItems(this.orderCon.getOrderOverview(this.loggedInPerson.getEmail()));
         } catch (SQLException ex) {
@@ -684,17 +783,21 @@ public class FXMLDocumentController implements Initializable {
         }
 
     }
-
+    //Denne metode opretter en order ud fra kundens kurv
     @FXML
     private void makeOrderHandler(ActionEvent event) throws SQLException {
+        //Hvis ikke der er nogen produkter i tableviewet, gør knappen usynlig
         if (basketView.getItems().isEmpty()) {
             baskerOrderButton.disableProperty();
+            //Ellers lav en ny ordre med kundens kurv
         } else {
             Order order = new Order(this.activeUser.getBasket());
-
+            //Hvis ikke der er nogen indlogget person (dvs. vedkommende er besøgende)
+            //Kør vinduet visitorbuyHandler og derefter betalingsvinduet
             if (this.loggedInPerson == null) {
                 visitorBuyHandler(event, order);
                 payHandler(event, order);
+            //Ellers sæt oplysninger fra den indlogget person og kør vinduet payhandler
             } else {
                 order.setAdress(this.loggedInPerson.getAddress());
                 order.setCustomerId(this.loggedInPerson.getId());
@@ -704,10 +807,11 @@ public class FXMLDocumentController implements Initializable {
 
                 payHandler(event, order);
             }
+            //Tilføj ordren til observableArrayList
             this.orderList.add(order);
         }
     }
-
+    //Denne metode ændrer på udseendet af programmer. Synliggør og usynligør elementer
     @FXML
     private void changeSelection(ActionEvent event) throws SQLException {
         this.generalPane.setVisible(true);
@@ -783,29 +887,34 @@ public class FXMLDocumentController implements Initializable {
 
         }
     }
-
+    //Denne metode opretter en konto
     @FXML
     private void createAccount(ActionEvent event) throws SQLException {
+        //Henter informationer brugeren taster ind i tekstfelterne
         String email = this.emailEntry.getText();
         String name = this.nameEntry.getText();
         String address = this.addressEntry.getText();
         String phone = this.phoneEntry.getText();
         String pw = this.pwEntry.getText();
-
+        
+        //Hvis brugeren indtaster email, navn og telefonnummer, fortsæt
         if (Checker.checkAccount(email, name, phone) == true) {
+            //Hvis der allerede findes en bruger med den email, smid fejlbesked
             if (accCon.accountExists(email)) {
                 this.signErrorLabel.setText("An account with this email already exists.");
             } else {
+                //Ellers indsæt en ny konto i databasen med følgende parametre
                 this.accCon.insertAccount(email, name, phone, address, pw);
+                //Udskriver at kontoen blev oprettet
                 this.signErrorLabel.setText("Your account has been created. Enjoy!");
             }
-
+            //kommer herind hvis nogen af oplysninger er skrevet forkert. Fx. string under telefonr.
         } else {
             this.signErrorLabel.setText("Some of the entered information is invalid");
         }
 
     }
-
+    //Knap til at lukke programmet
     @FXML
     private void handlerCloseProgramButton(ActionEvent event) {
         Alert closeAlert = new Alert(Alert.AlertType.WARNING);
@@ -820,7 +929,7 @@ public class FXMLDocumentController implements Initializable {
         } else if (result.get() == nButton) {
         }
     }
-
+    //Knap til få kort introduktion til programmet
     @FXML
     private void handlerHowToButton(ActionEvent event) {
         Text t;
@@ -839,7 +948,9 @@ public class FXMLDocumentController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        //Ved start af programmet bliver personen sat til at være en besøgende
         this.activeUser = new Visitor();
+        //Opretter forbindelse til de tre databaser
         this.accCon = new AccountsConnector("jdbc:postgresql://151.80.57.19:5432/admin_semester", "admin_willf", "2111993");
         this.prodCon = new ProductConnector("jdbc:postgresql://151.80.57.19:5432/admin_semester", "admin_willf", "2111993");
         this.orderCon = new OrderConnector("jdbc:postgresql://151.80.57.19:5432/admin_semester", "admin_willf", "2111993");
@@ -856,18 +967,22 @@ public class FXMLDocumentController implements Initializable {
         this.generalPane.setVisible(false);
 
         this.productTable.getColumns().clear();
-
-        this.tabPane.getTabs().removeAll(this.orderHistTab, this.prodManTab, this.employeeOrderTab);
+        
+        //Henter alle tabs og fjerner de tabs som ikke skal vises ved opstart
+        this.tabPane.getTabs().removeAll(this.orderHistTab, this.prodManTab, this.employeeOrderTab, this.addProductTab);
         this.prodManCommitButton.setDisable(true);
-
-        this.prodManView.getSelectionModel().selectedItemProperty().addListener((observable) -> {
+        
+        
+        this.prodManView.getSelectionModel().selectedItemProperty().addListener(
+                (observable) -> {
             final Product product = this.prodManView.getSelectionModel().selectedItemProperty().get();
             if (product != null) {
                 this.prodManArea.clear();
                 this.prodManArea.setText(product.getDescription());
                 this.prodManCommitButton.setDisable(true);
             }
-        });
+        }
+        );
 
         this.prodManArea.textProperty().addListener(new ChangeListener<String>() {
             @Override
@@ -877,7 +992,9 @@ public class FXMLDocumentController implements Initializable {
         });
 
     }
-
+    //Node finder ud af hvilke vindue actioneventet kommer fra.
+    //Visitorbuyhandler er overflødig, da man laver en metode for at 
+    //kalde en anden metode. 
     private void visitorBuyHandler(ActionEvent event, Order order) {
         showVisitorBuy(((Node) event.getTarget()).getScene().getWindow(), order);
     }
@@ -972,6 +1089,31 @@ public class FXMLDocumentController implements Initializable {
             alert.initModality(Modality.APPLICATION_MODAL);
         }
         alert.showAndWait();
+    }
+
+
+    @FXML
+    private void handlerAddProductToDatabase(ActionEvent event) {
+          try {
+            //Parse metoden til en double, da addProductPriceField returnerer en double, men getText er en string
+            double price = Double.parseDouble(addProductPriceField.getText());
+            prodCon.addProductToDatabase(addProductNameField.getText(),
+                    price, addProductDescriptionField.getText(), addProductTypeField.getText());
+            
+            if (addProductNameField.getText().isEmpty() && addProductTypeField.getText().isEmpty()) {
+            String message = "You must enter information in all of the fields";
+            createModal(message, AlertType.ERROR, true, "Error", "Error");
+            }
+        } catch (NumberFormatException ex) {
+            System.out.println("Something went wrong");
+            ex.printStackTrace();
+        } catch (SQLException ex) {
+            System.out.println("Something went wrong");
+            ex.printStackTrace();
+        }
+        String message = "You have added a new product to the database";
+        createModal(message, AlertType.CONFIRMATION, true, "Congratulations", "Congratulations");  
+        
     }
 
 }
