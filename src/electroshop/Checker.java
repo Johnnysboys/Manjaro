@@ -1,7 +1,5 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Dette er en tjekkerklasse, som sørger for at tjekke forskellige indtastninger.
  */
 package electroshop;
 
@@ -26,26 +24,20 @@ public class Checker {
 
         if (checkEmail(email) == true && checkName(name) == true && checkPhone(phone) == true) {
             accountGood = true;
-
         }
-
         return accountGood;
-
     }
 
     public static Boolean checkEmail(String c) {
         Boolean isEmail = false;
-
         if (c.contains("@")) {
             isEmail = true;
         }
-
         return isEmail;
     }
 
     public static Boolean checkPhone(String c) {
         Boolean isPhone = false;
-
         if (c.length() == 8) {
             isPhone = true;
         }
@@ -54,13 +46,11 @@ public class Checker {
 
     public static Boolean checkName(String c) {
         Boolean isName = true;
-
         if (c.equals("")) {
             isName = false;
         } else if (Character.isWhitespace(c.charAt(0))) {
             isName = false;
         }
-
         return isName;
     }
 
@@ -91,7 +81,6 @@ public class Checker {
         if (!c.equals("")) {
             if (Character.isWhitespace(c.charAt(0))) {
                 nameFlag = false;
-            } else {
             }
         } else {
             nameFlag = false;
@@ -104,50 +93,42 @@ public class Checker {
         int checkInt = 0;
         if (!c.equals("")) {
             if (Character.isWhitespace(c.charAt(0))) {
-                //System.out.println("Integers cannot start with a space");
                 typeChecksOut = false;
             } else {
-
                 try {
                     checkInt = Integer.parseInt(c);
-                    // System.out.println("Type is true (Int)");
                 } catch (NumberFormatException err) {
-                    // System.out.println("Wrong input type:");
-                    // System.out.println(err.getMessage());
-                    //  System.out.println("Expected integer");
-
                     typeChecksOut = false;
                 }
-
             }
         } else {
-            // System.out.println("String was empty");
             typeChecksOut = false;
         }
         return typeChecksOut;
     }
 
     public static String getColumn(int i) {
-        if (i == 1) {
-            return col1;
-        } else if (i == 2) {
-            return col2;
-        } else if (i == 3) {
-            return col3;
-        } else if (i == 4) {
-            return col4;
-        } else if (i == 5) {
-            return col5;
-        } else if (i == 6) {
-            return col6;
-        } else if (i == 7) {
-            return col7;
-        } else if (i == 8) {
-            return col8;
-        } else if (i == 9) {
-            return col9;
-        } else {
-            return null;
+        switch (i) {
+            case 1:
+                return col1;
+            case 2:
+                return col2;
+            case 3:
+                return col3;
+            case 4:
+                return col4;
+            case 5:
+                return col5;
+            case 6:
+                return col6;
+            case 7:
+                return col7;
+            case 8:
+                return col8;
+            case 9:
+                return col9;
+            default:
+                return null;
         }
     }
 }

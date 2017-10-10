@@ -26,15 +26,19 @@ public class AccountsConnector extends SuperDB {
 
     public LoggedInPerson login(String email, String pw, Basket basket) throws SQLException {
         String loginSearch = "SELECT * FROM accounts WHERE email = ? AND pw = ?;";
+        //Laver et prepared Statement, som eksekverer SQL-statement. Henter forbindelsen til
+        //databasen og sætter loginSearch som parameter
         PreparedStatement search = this.getCon().prepareStatement(loginSearch);
-
+        //Sætter stringen 1 fordi det er email der står først
         search.setString(1, email);
         search.setString(2, pw);
-
+        
+        //SQL statement der læser data fra databasen skal returnere det til et resultset
         ResultSet rs = search.executeQuery();
 
         LoggedInPerson person = null;
-
+        
+        //Kigger på næste række i databasen og returnere true, hvis der er noget
         while (rs.next()) {
             int id = rs.getInt("id");
             String email1 = rs.getString("email");
@@ -68,7 +72,7 @@ public class AccountsConnector extends SuperDB {
 
         Boolean exists = this.accountExists(email);
 
-        if (exists == true) {
+        if (exists) {
             System.out.println("an account with this email already exists");
         } else {
             String addString = "insert into accounts (email, name, phone, address, pw, sec) VALUES (?, ?, ?, ?, ?, ?)";
@@ -88,15 +92,9 @@ public class AccountsConnector extends SuperDB {
     public Boolean accountExists(String email) throws SQLException {
         String search = "SELECT email FROM accounts WHERE email = ?;";
         PreparedStatement search2 = this.getCon().prepareStatement(search);
-
         search2.setString(1, email);
         ResultSet rs = search2.executeQuery();
-        if (rs.next() == true) {
-            return true;
-        } else {
-            return false;
-        }
-
+        // Returns true if the account exists
+        return rs.next();
     }
-
 }

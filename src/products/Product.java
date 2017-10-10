@@ -12,16 +12,13 @@ import java.util.ArrayList;
  * @author Jakob
  */
 public abstract class Product {
-    
+
     private int productId;
     private String productName;
     private double price;
     private String description;
-    
-    
-    
-    
-    public Product(int productId, String productName, double price, String productDesc){
+
+    public Product(int productId, String productName, double price, String productDesc) {
         this.productId = productId;
         this.productName = productName;
         this.price = price;
@@ -59,12 +56,12 @@ public abstract class Product {
     public void setDescription(String description) {
         this.description = description;
     }
-    
+
     @Override
-    public String toString(){
+    public String toString() {
         return "This product is named: " + productName;
     }
-    
+
     public abstract ArrayList<String> getProductRow();
 
 }

@@ -15,9 +15,11 @@ import products.Product;
  * @author Jakob
  */
 public class Basket {
-
-    private HashMap<Product, String> productMap;
-
+    
+    //Der erklæres et hashMap bestående af Product-objekt og Integer
+    private HashMap<Product, Integer> productMap;
+    
+    //Instantiere mappet til at være et hashMap
     public Basket() {
         this.productMap = new HashMap<>();
     }
@@ -29,18 +31,15 @@ public class Basket {
      * @param product - The product to add to the basket (Key).
      * @param quantity - The quantity of said product to add (Value).
      */
-    public void addProduct(Product product, String quantity) {
+    //Tilføjer produkt til kurven
+    public void addProduct(Product product, Integer quantity) {
         if (productMap.containsKey(product)) {
-            String amount = (String) productMap.get(product);
-            int newQuant = Integer.valueOf(amount)+Integer.valueOf(quantity);
-            String newAmount = Integer.toString(newQuant);
-            
-            productMap.put(product, newAmount);
-            
+            //Hvis produktet allerede findes tilføjes mængden (quantity)
+            productMap.put(product, productMap.get(product) + quantity);
         } else {
+            //Ellers lægges produktet og mængden i hashMappet
             productMap.put(product, quantity);
         }
-
     }
 
     /**
@@ -49,6 +48,7 @@ public class Basket {
      * @param product - The product (Key) to remove from the HashMap.
      */
     public void removeProduct(Product product) {
+        //Hvis mappet indeholder produktet som key, fjern det
         if (productMap.containsKey(product)) {
             productMap.remove(product);
         }
@@ -57,24 +57,29 @@ public class Basket {
     /**
      * Clears the baskets HashMap of all entries.
      */
+    //Ryd kurven
     public void emptyBasket() {
         productMap.clear();
     }
 
     /**
-     * Iterates through the basket, and returns a double with the total price of all products.
-     * @return - A double containing the price for the entire basket. 
+     * Iterates through the basket, and returns a double with the total price of
+     * all products.
+     *
+     * @return - A double containing the price for the entire basket.
      */
     public double getTotal() {
         double total = 0;
 
         Set<Product> keySet = productMap.keySet();
         Iterator<Product> keyIterator = keySet.iterator();
-
+        
         while (keyIterator.hasNext()) {
             Product product = keyIterator.next();
-            int currentValue = Integer.valueOf(productMap.get(product));
+            int currentValue = productMap.get(product);
+
             total = total + (product.getPrice() * currentValue);
+
         }
 
         return total;

@@ -97,7 +97,7 @@ public class PaypalDialogController implements Initializable {
                 alert.getButtonTypes().setAll(coolButton);
                 alert.showAndWait();
                 this.order.setIsPaid(true);
-                dialog.close();
+                this.dialog.close();
             } else {
                 Alert alert = new Alert(Alert.AlertType.WARNING);
                 alert.setContentText("You payment was decliend or wrong card try again.");

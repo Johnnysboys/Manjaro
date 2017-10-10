@@ -84,7 +84,7 @@
                               </Pane>
                            </children>
                         </Pane>
-                        <Button fx:id="searchButton" disable="true" layoutX="285.0" layoutY="14.0" mnemonicParsing="false" onAction="#searchProducts" text="Søg" />
+                        <Button fx:id="searchButton" disable="true" layoutX="285.0" layoutY="14.0" mnemonicParsing="false" onAction="#searchProducts" text="Search" />
                         <TableView fx:id="productTable" layoutX="343.0" layoutY="61.0" prefHeight="449.0" prefWidth="735.0">
                           <columns>
                             <TableColumn prefWidth="75.0" text="C1" />
@@ -106,7 +106,6 @@
                         <Label layoutX="205.0" layoutY="463.0" text="Total Price:" />
                         <Label fx:id="totalLabel" layoutX="274.0" layoutY="463.0" text="0" />
                         <Button fx:id="baskerOrderButton" layoutX="23.0" layoutY="497.0" mnemonicParsing="false" onAction="#makeOrderHandler" text="Order and pay" />
-                        <!--<Button fx:id="payButton" layoutX="23.0" layoutY="497.0" mnemonicParsing="false" onAction="#payHandler" prefHeight="25.0" prefWidth="54.0" text="Pay" />-->
                      </children></AnchorPane>
             </content>
           </Tab>
@@ -141,12 +140,6 @@
                           </columns>
                         </TableView>
                         <Button fx:id="showOrderButton" layoutX="14.0" layoutY="408.0" mnemonicParsing="false" onAction="#showOrderHistory" text="Show Orders" />
-                        <TableView fx:id="orderProdView" layoutX="486.0" layoutY="14.0" prefHeight="239.0" prefWidth="279.0">
-                          <columns>
-                            <TableColumn prefWidth="75.0" text="C1" />
-                            <TableColumn prefWidth="75.0" text="C2" />
-                          </columns>
-                        </TableView>
                      </children>
                   </AnchorPane>
               </content>
@@ -161,14 +154,8 @@
                             <TableColumn prefWidth="75.0" text="C2" />
                           </columns>
                         </TableView>
-                        <TableView fx:id="empOrderProdView" layoutX="567.0" layoutY="14.0" prefHeight="285.0" prefWidth="355.0">
-                          <columns>
-                            <TableColumn prefWidth="75.0" text="C1" />
-                            <TableColumn prefWidth="75.0" text="C2" />
-                          </columns>
-                        </TableView>
                         <Button fx:id="empFindButton" layoutX="271.0" layoutY="407.0" mnemonicParsing="false" onAction="#searchForOrders" text="Find" />
-                        <TextField fx:id="empOrderSearchField" layoutX="111.0" layoutY="407.0" promptText="Enter customer email..." />
+                        <TextField fx:id="empOrderSearchField" layoutX="111.0" layoutY="407.0" promptText="Enter customer email..." text="jakob.bisander@hotmail.com" />
                         <Label layoutX="14.0" layoutY="411.0" text="Customer Email:" />
                         <CheckBox fx:id="deliveredCheckBox" layoutX="567.0" layoutY="322.0" mnemonicParsing="false" text="Delivered" />
                         <CheckBox fx:id="paidCheckBox" layoutX="567.0" layoutY="354.0" mnemonicParsing="false" text="Paid" />
@@ -190,6 +177,22 @@
                   </AnchorPane>
               </content>
             </Tab>
+            <Tab fx:id="addProductTab" text="Tilføj produkt til databasen">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <TextField fx:id="addProductNameField" layoutX="88.0" layoutY="135.0" />
+                        <TextField fx:id="addProductDescriptionField" layoutX="88.0" layoutY="205.0" />
+                        <TextField fx:id="addProductPriceField" layoutX="88.0" layoutY="273.0" />
+                        <TextField fx:id="addProductTypeField" layoutX="88.0" layoutY="348.0" />
+                        <Button layoutX="91.0" layoutY="403.0" mnemonicParsing="false" onAction="#handlerAddProductToDatabase" text="Tilføj produkt til databasen" />
+                        <Label layoutX="90.0" layoutY="98.0" text="Navn" />
+                        <Label layoutX="86.0" layoutY="174.0" text="Beskrivelse" />
+                        <Label layoutX="90.0" layoutY="243.0" text="Pris" />
+                        <Label layoutX="93.0" layoutY="313.0" text="Produkttype" />
+                     </children></AnchorPane>
+              </content>
+            </Tab>
         </tabs>
       </TabPane>
       <Pane fx:id="loggedInPane" layoutX="15.0" layoutY="685.0" prefHeight="75.0" prefWidth="574.0" style="-fx-border-color: black;" visible="false">
@@ -199,7 +202,7 @@
             <Label fx:id="userInfoLabel" layoutX="122.0" layoutY="27.0" text="setEmailHere + (SecurityLevel)" />
          </children>
       </Pane>
-    <Button layoutX="953.0" layoutY="709.0" mnemonicParsing="false" onAction="#handlerClosePoogramButton" text="Close program" />
+    <Button layoutX="953.0" layoutY="709.0" mnemonicParsing="false" onAction="#handlerCloseProgramButton" text="Close program" />
     <Button layoutX="866.0" layoutY="709.0" mnemonicParsing="false" onAction="#handlerHowToButton" text="How to?" />
    </children>
 </AnchorPane>
